@@ -1,0 +1,1420 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.area",
+    "label": "Create table \"area\"",
+    "summary": "Creates table \"area\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "area"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"area\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"area\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"area\"",
+        "sql": "CREATE TABLE \"public\".\"area\" (\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"area\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"area\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.buyer",
+    "label": "Create table \"buyer\"",
+    "summary": "Creates table \"buyer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "buyer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"buyer\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"buyer\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"buyer\"",
+        "sql": "CREATE TABLE \"public\".\"buyer\" (\n  \"areaId\" int4 NOT NULL,\n  \"budget\" int4 NOT NULL,\n  \"clientId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"length\" int4 NOT NULL,\n  \"remarks\" text,\n  \"status\" text DEFAULT 'NOTPURCHASED' NOT NULL,\n  \"width\" int4 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"buyer_status_check_1f93115c\" CHECK (\"status\" IN ('NOTPURCHASED', 'PURCHASED', 'CANCELLED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"buyer\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"buyer\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.client",
+    "label": "Create table \"client\"",
+    "summary": "Creates table \"client\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "client"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"client\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"client\"",
+        "sql": "CREATE TABLE \"public\".\"client\" (\n  \"address\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"mobileNumber\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"remarks\" text,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"client\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.colony",
+    "label": "Create table \"colony\"",
+    "summary": "Creates table \"colony\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "colony"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"colony\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"colony\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"colony\"",
+        "sql": "CREATE TABLE \"public\".\"colony\" (\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"colony\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"colony\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.employee",
+    "label": "Create table \"employee\"",
+    "summary": "Creates table \"employee\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "employee"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"employee\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"employee\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"employee\"",
+        "sql": "CREATE TABLE \"public\".\"employee\" (\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"phoneNumber\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"employee\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"employee\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.flat",
+    "label": "Create table \"flat\"",
+    "summary": "Creates table \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"flat\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"flat\"",
+        "sql": "CREATE TABLE \"public\".\"flat\" (\n  \"flatNumber\" text NOT NULL,\n  \"floorId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"status\" text DEFAULT 'AVAILABLE' NOT NULL,\n  \"type\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"flat_status_check_2ae4bb86\" CHECK (\"status\" IN ('AVAILABLE', 'SOLD'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"flat\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.floor",
+    "label": "Create table \"floor\"",
+    "summary": "Creates table \"floor\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "floor"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"floor\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"floor\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"floor\"",
+        "sql": "CREATE TABLE \"public\".\"floor\" (\n  \"id\" SERIAL NOT NULL,\n  \"numberOfFlats\" int4 NOT NULL,\n  \"wingId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"floor\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"floor\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.followUp",
+    "label": "Create table \"followUp\"",
+    "summary": "Creates table \"followUp\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "followUp"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"followUp\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"followUp\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"followUp\"",
+        "sql": "CREATE TABLE \"public\".\"followUp\" (\n  \"clientId\" int4 NOT NULL,\n  \"dateTime\" timestamptz NOT NULL,\n  \"employeeId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"notes\" text,\n  \"purpose\" text DEFAULT 'GENERAL' NOT NULL,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"followUp_purpose_check_ecca10a7\" CHECK (\"purpose\" IN ('GENERAL', 'MARKETING', 'BUYER', 'SELLER')),\n  CONSTRAINT \"followUp_status_check_e7e59b77\" CHECK (\"status\" IN ('PENDING', 'DONE', 'POSTPONED', 'CANCELLED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"followUp\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"followUp\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.marketing",
+    "label": "Create table \"marketing\"",
+    "summary": "Creates table \"marketing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "marketing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"marketing\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"marketing\"",
+        "sql": "CREATE TABLE \"public\".\"marketing\" (\n  \"clientId\" int4 NOT NULL,\n  \"colonyId\" int4 NOT NULL,\n  \"employeeId\" int4,\n  \"id\" SERIAL NOT NULL,\n  \"priority\" text DEFAULT 'ONE_STAR' NOT NULL,\n  \"remarks\" text,\n  \"status\" text DEFAULT 'NONE' NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"marketing_priority_check_c89dc4c3\" CHECK (\"priority\" IN ('ONE_STAR', 'TWO_STAR', 'THREE_STAR', 'FOUR_STAR', 'FIVE_STAR')),\n  CONSTRAINT \"marketing_status_check_df585cdd\" CHECK (\"status\" IN ('NONE', 'CALLED_NOT_VISITED', 'VISITED', 'NOT_INTERESTED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"marketing\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.seller",
+    "label": "Create table \"seller\"",
+    "summary": "Creates table \"seller\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "seller"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"seller\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"seller\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"seller\"",
+        "sql": "CREATE TABLE \"public\".\"seller\" (\n  \"areaId\" int4 NOT NULL,\n  \"clientId\" int4 NOT NULL,\n  \"demand\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"length\" int4 NOT NULL,\n  \"remarks\" text,\n  \"status\" text DEFAULT 'UNSOLD' NOT NULL,\n  \"width\" int4 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"seller_status_check_1b62e46e\" CHECK (\"status\" IN ('UNSOLD', 'SOLD'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"seller\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"seller\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.wing",
+    "label": "Create table \"wing\"",
+    "summary": "Creates table \"wing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "wing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"wing\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"wing\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"wing\"",
+        "sql": "CREATE TABLE \"public\".\"wing\" (\n  \"colonyId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"numberOfFloors\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"wing\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"wing\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.buyer.buyer_areaId_idx_abf7188c",
+    "label": "Create index \"buyer_areaId_idx_abf7188c\" on \"buyer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "buyer_areaId_idx_abf7188c",
+        "table": "buyer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"buyer_areaId_idx_abf7188c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"buyer_areaId_idx_abf7188c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"buyer_areaId_idx_abf7188c\"",
+        "sql": "CREATE INDEX \"buyer_areaId_idx_abf7188c\" ON \"public\".\"buyer\" (\"areaId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"buyer_areaId_idx_abf7188c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"buyer_areaId_idx_abf7188c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.buyer.buyer_clientId_idx_153a9a49",
+    "label": "Create index \"buyer_clientId_idx_153a9a49\" on \"buyer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "buyer_clientId_idx_153a9a49",
+        "table": "buyer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"buyer_clientId_idx_153a9a49\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"buyer_clientId_idx_153a9a49\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"buyer_clientId_idx_153a9a49\"",
+        "sql": "CREATE INDEX \"buyer_clientId_idx_153a9a49\" ON \"public\".\"buyer\" (\"clientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"buyer_clientId_idx_153a9a49\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"buyer_clientId_idx_153a9a49\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.flat.flat_floorId_idx_f24b0a84",
+    "label": "Create index \"flat_floorId_idx_f24b0a84\" on \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "flat_floorId_idx_f24b0a84",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"flat_floorId_idx_f24b0a84\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat_floorId_idx_f24b0a84\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"flat_floorId_idx_f24b0a84\"",
+        "sql": "CREATE INDEX \"flat_floorId_idx_f24b0a84\" ON \"public\".\"flat\" (\"floorId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"flat_floorId_idx_f24b0a84\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat_floorId_idx_f24b0a84\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.floor.floor_wingId_idx_68467838",
+    "label": "Create index \"floor_wingId_idx_68467838\" on \"floor\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "floor_wingId_idx_68467838",
+        "table": "floor"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"floor_wingId_idx_68467838\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"floor_wingId_idx_68467838\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"floor_wingId_idx_68467838\"",
+        "sql": "CREATE INDEX \"floor_wingId_idx_68467838\" ON \"public\".\"floor\" (\"wingId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"floor_wingId_idx_68467838\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"floor_wingId_idx_68467838\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.followUp.followUp_clientId_idx_153a9a49",
+    "label": "Create index \"followUp_clientId_idx_153a9a49\" on \"followUp\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "followUp_clientId_idx_153a9a49",
+        "table": "followUp"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"followUp_clientId_idx_153a9a49\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"followUp_clientId_idx_153a9a49\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"followUp_clientId_idx_153a9a49\"",
+        "sql": "CREATE INDEX \"followUp_clientId_idx_153a9a49\" ON \"public\".\"followUp\" (\"clientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"followUp_clientId_idx_153a9a49\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"followUp_clientId_idx_153a9a49\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.followUp.followUp_employeeId_idx_087dd4a6",
+    "label": "Create index \"followUp_employeeId_idx_087dd4a6\" on \"followUp\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "followUp_employeeId_idx_087dd4a6",
+        "table": "followUp"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"followUp_employeeId_idx_087dd4a6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"followUp_employeeId_idx_087dd4a6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"followUp_employeeId_idx_087dd4a6\"",
+        "sql": "CREATE INDEX \"followUp_employeeId_idx_087dd4a6\" ON \"public\".\"followUp\" (\"employeeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"followUp_employeeId_idx_087dd4a6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"followUp_employeeId_idx_087dd4a6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.marketing.marketing_clientId_idx_153a9a49",
+    "label": "Create index \"marketing_clientId_idx_153a9a49\" on \"marketing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "marketing_clientId_idx_153a9a49",
+        "table": "marketing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"marketing_clientId_idx_153a9a49\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing_clientId_idx_153a9a49\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"marketing_clientId_idx_153a9a49\"",
+        "sql": "CREATE INDEX \"marketing_clientId_idx_153a9a49\" ON \"public\".\"marketing\" (\"clientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"marketing_clientId_idx_153a9a49\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing_clientId_idx_153a9a49\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.marketing.marketing_colonyId_idx_fe680993",
+    "label": "Create index \"marketing_colonyId_idx_fe680993\" on \"marketing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "marketing_colonyId_idx_fe680993",
+        "table": "marketing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"marketing_colonyId_idx_fe680993\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing_colonyId_idx_fe680993\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"marketing_colonyId_idx_fe680993\"",
+        "sql": "CREATE INDEX \"marketing_colonyId_idx_fe680993\" ON \"public\".\"marketing\" (\"colonyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"marketing_colonyId_idx_fe680993\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing_colonyId_idx_fe680993\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.marketing.marketing_employeeId_idx_087dd4a6",
+    "label": "Create index \"marketing_employeeId_idx_087dd4a6\" on \"marketing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "marketing_employeeId_idx_087dd4a6",
+        "table": "marketing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"marketing_employeeId_idx_087dd4a6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing_employeeId_idx_087dd4a6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"marketing_employeeId_idx_087dd4a6\"",
+        "sql": "CREATE INDEX \"marketing_employeeId_idx_087dd4a6\" ON \"public\".\"marketing\" (\"employeeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"marketing_employeeId_idx_087dd4a6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"marketing_employeeId_idx_087dd4a6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.seller.seller_areaId_idx_abf7188c",
+    "label": "Create index \"seller_areaId_idx_abf7188c\" on \"seller\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "seller_areaId_idx_abf7188c",
+        "table": "seller"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"seller_areaId_idx_abf7188c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"seller_areaId_idx_abf7188c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"seller_areaId_idx_abf7188c\"",
+        "sql": "CREATE INDEX \"seller_areaId_idx_abf7188c\" ON \"public\".\"seller\" (\"areaId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"seller_areaId_idx_abf7188c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"seller_areaId_idx_abf7188c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.seller.seller_clientId_idx_153a9a49",
+    "label": "Create index \"seller_clientId_idx_153a9a49\" on \"seller\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "seller_clientId_idx_153a9a49",
+        "table": "seller"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"seller_clientId_idx_153a9a49\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"seller_clientId_idx_153a9a49\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"seller_clientId_idx_153a9a49\"",
+        "sql": "CREATE INDEX \"seller_clientId_idx_153a9a49\" ON \"public\".\"seller\" (\"clientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"seller_clientId_idx_153a9a49\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"seller_clientId_idx_153a9a49\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.wing.wing_colonyId_idx_fe680993",
+    "label": "Create index \"wing_colonyId_idx_fe680993\" on \"wing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "wing_colonyId_idx_fe680993",
+        "table": "wing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"wing_colonyId_idx_fe680993\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"wing_colonyId_idx_fe680993\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"wing_colonyId_idx_fe680993\"",
+        "sql": "CREATE INDEX \"wing_colonyId_idx_fe680993\" ON \"public\".\"wing\" (\"colonyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"wing_colonyId_idx_fe680993\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"wing_colonyId_idx_fe680993\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.buyer.buyer_clientId_fkey",
+    "label": "Add foreign key \"buyer_clientId_fkey\" on \"buyer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "buyer_clientId_fkey",
+        "table": "buyer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"buyer_clientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "buyer_clientId_fkey",
+          "public",
+          "\"public\".\"buyer\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"buyer_clientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"buyer\"\nADD CONSTRAINT \"buyer_clientId_fkey\"\nFOREIGN KEY (\"clientId\")\nREFERENCES \"public\".\"client\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"buyer_clientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "buyer_clientId_fkey",
+          "public",
+          "\"public\".\"buyer\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.buyer.buyer_areaId_fkey",
+    "label": "Add foreign key \"buyer_areaId_fkey\" on \"buyer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "buyer_areaId_fkey",
+        "table": "buyer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"buyer_areaId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "buyer_areaId_fkey",
+          "public",
+          "\"public\".\"buyer\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"buyer_areaId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"buyer\"\nADD CONSTRAINT \"buyer_areaId_fkey\"\nFOREIGN KEY (\"areaId\")\nREFERENCES \"public\".\"area\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"buyer_areaId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "buyer_areaId_fkey",
+          "public",
+          "\"public\".\"buyer\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.flat.flat_floorId_fkey",
+    "label": "Add foreign key \"flat_floorId_fkey\" on \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "flat_floorId_fkey",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"flat_floorId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_floorId_fkey",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"flat_floorId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"flat\"\nADD CONSTRAINT \"flat_floorId_fkey\"\nFOREIGN KEY (\"floorId\")\nREFERENCES \"public\".\"floor\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"flat_floorId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_floorId_fkey",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.floor.floor_wingId_fkey",
+    "label": "Add foreign key \"floor_wingId_fkey\" on \"floor\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "floor_wingId_fkey",
+        "table": "floor"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"floor_wingId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "floor_wingId_fkey",
+          "public",
+          "\"public\".\"floor\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"floor_wingId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"floor\"\nADD CONSTRAINT \"floor_wingId_fkey\"\nFOREIGN KEY (\"wingId\")\nREFERENCES \"public\".\"wing\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"floor_wingId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "floor_wingId_fkey",
+          "public",
+          "\"public\".\"floor\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.followUp.followUp_clientId_fkey",
+    "label": "Add foreign key \"followUp_clientId_fkey\" on \"followUp\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "followUp_clientId_fkey",
+        "table": "followUp"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"followUp_clientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "followUp_clientId_fkey",
+          "public",
+          "\"public\".\"followUp\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"followUp_clientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"followUp\"\nADD CONSTRAINT \"followUp_clientId_fkey\"\nFOREIGN KEY (\"clientId\")\nREFERENCES \"public\".\"client\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"followUp_clientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "followUp_clientId_fkey",
+          "public",
+          "\"public\".\"followUp\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.followUp.followUp_employeeId_fkey",
+    "label": "Add foreign key \"followUp_employeeId_fkey\" on \"followUp\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "followUp_employeeId_fkey",
+        "table": "followUp"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"followUp_employeeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "followUp_employeeId_fkey",
+          "public",
+          "\"public\".\"followUp\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"followUp_employeeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"followUp\"\nADD CONSTRAINT \"followUp_employeeId_fkey\"\nFOREIGN KEY (\"employeeId\")\nREFERENCES \"public\".\"employee\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"followUp_employeeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "followUp_employeeId_fkey",
+          "public",
+          "\"public\".\"followUp\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.marketing.marketing_clientId_fkey",
+    "label": "Add foreign key \"marketing_clientId_fkey\" on \"marketing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "marketing_clientId_fkey",
+        "table": "marketing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"marketing_clientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "marketing_clientId_fkey",
+          "public",
+          "\"public\".\"marketing\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"marketing_clientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"marketing\"\nADD CONSTRAINT \"marketing_clientId_fkey\"\nFOREIGN KEY (\"clientId\")\nREFERENCES \"public\".\"client\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"marketing_clientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "marketing_clientId_fkey",
+          "public",
+          "\"public\".\"marketing\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.marketing.marketing_employeeId_fkey",
+    "label": "Add foreign key \"marketing_employeeId_fkey\" on \"marketing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "marketing_employeeId_fkey",
+        "table": "marketing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"marketing_employeeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "marketing_employeeId_fkey",
+          "public",
+          "\"public\".\"marketing\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"marketing_employeeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"marketing\"\nADD CONSTRAINT \"marketing_employeeId_fkey\"\nFOREIGN KEY (\"employeeId\")\nREFERENCES \"public\".\"employee\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"marketing_employeeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "marketing_employeeId_fkey",
+          "public",
+          "\"public\".\"marketing\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.marketing.marketing_colonyId_fkey",
+    "label": "Add foreign key \"marketing_colonyId_fkey\" on \"marketing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "marketing_colonyId_fkey",
+        "table": "marketing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"marketing_colonyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "marketing_colonyId_fkey",
+          "public",
+          "\"public\".\"marketing\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"marketing_colonyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"marketing\"\nADD CONSTRAINT \"marketing_colonyId_fkey\"\nFOREIGN KEY (\"colonyId\")\nREFERENCES \"public\".\"colony\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"marketing_colonyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "marketing_colonyId_fkey",
+          "public",
+          "\"public\".\"marketing\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.seller.seller_clientId_fkey",
+    "label": "Add foreign key \"seller_clientId_fkey\" on \"seller\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "seller_clientId_fkey",
+        "table": "seller"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"seller_clientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_clientId_fkey",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"seller_clientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"seller\"\nADD CONSTRAINT \"seller_clientId_fkey\"\nFOREIGN KEY (\"clientId\")\nREFERENCES \"public\".\"client\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"seller_clientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_clientId_fkey",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.seller.seller_areaId_fkey",
+    "label": "Add foreign key \"seller_areaId_fkey\" on \"seller\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "seller_areaId_fkey",
+        "table": "seller"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"seller_areaId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_areaId_fkey",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"seller_areaId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"seller\"\nADD CONSTRAINT \"seller_areaId_fkey\"\nFOREIGN KEY (\"areaId\")\nREFERENCES \"public\".\"area\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"seller_areaId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_areaId_fkey",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.wing.wing_colonyId_fkey",
+    "label": "Add foreign key \"wing_colonyId_fkey\" on \"wing\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "wing_colonyId_fkey",
+        "table": "wing"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"wing_colonyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "wing_colonyId_fkey",
+          "public",
+          "\"public\".\"wing\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"wing_colonyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"wing\"\nADD CONSTRAINT \"wing_colonyId_fkey\"\nFOREIGN KEY (\"colonyId\")\nREFERENCES \"public\".\"colony\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"wing_colonyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "wing_colonyId_fkey",
+          "public",
+          "\"public\".\"wing\""
+        ]
+      }
+    ]
+  }
+]

@@ -1,3 +1,6 @@
+import Header from "@/app/components/header";
+import Sidebar from "@/app/components/sideBar";
+
 const modules = [
   {
     title: "Marketing",
@@ -7,92 +10,42 @@ const modules = [
   },
   {
     title: "Buyers & Sellers",
-    description: "Manage property requirements and buyer-seller relationships.",
+    description:
+      "Manage property requirements and buyer-seller relationships.",
     icon: "🏠",
     href: "/buyers-sellers",
   },
   {
     title: "General Contacts",
-    description: "Keep track of contacts and future business opportunities.",
+    description:
+      "Keep track of contacts and future business opportunities.",
     icon: "👥",
     href: "/contacts",
   },
 ];
 
-const navigation = [
-  { name: "Dashboard", icon: "▦", href: "/dashboard" },
-  { name: "Marketing", icon: "📢", href: "/marketing" },
-  { name: "Buyers / Sellers", icon: "🏠", href: "/buyers-sellers" },
-  { name: "Contacts", icon: "👥", href: "/contacts" },
-  { name: "Follow-ups", icon: "↻", href: "/follow-ups" },
-  { name: "Employees", icon: "♙", href: "/employees" },
-];
-
 export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      {/* Top Header */}
-      <header className="h-16 border-b border-slate-800 bg-slate-950 flex items-center justify-between px-6">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-lg">
-            🏠
-          </div>
 
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">BrokerHub</h1>
-            <p className="text-xs text-slate-500">Real Estate CRM</p>
-          </div>
-        </div>
-
-        {/* User */}
-        <div className="flex items-center gap-3">
-          <div className="hidden text-right sm:block">
-            <p className="text-sm font-medium">Owner</p>
-            <p className="text-xs text-slate-500">Administrator</p>
-          </div>
-
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 border border-slate-700">
-            👤
-          </div>
-        </div>
-      </header>
+      {/* Global Header */}
+      <Header />
 
       {/* Main Layout */}
       <div className="flex min-h-[calc(100vh-4rem)]">
-        {/* Sidebar */}
-        <aside className="hidden w-60 border-r border-slate-800 bg-slate-950 md:block">
-          <nav className="p-4">
-            <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Workspace
-            </p>
 
-            <div className="space-y-1">
-              {navigation.map((item, index) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                    index === 0
-                      ? "bg-blue-600/10 text-blue-400"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-white"
-                  }`}
-                >
-                  <span className="w-5 text-center">{item.icon}</span>
-
-                  <span>{item.name}</span>
-                </a>
-              ))}
-            </div>
-          </nav>
-        </aside>
+        {/* Global Sidebar */}
+        <Sidebar />
 
         {/* Dashboard Content */}
         <main className="flex-1">
           <div className="mx-auto max-w-7xl p-6 lg:p-8">
+
             {/* Page Heading */}
             <div className="mb-8">
-              <p className="text-sm text-slate-500">Overview</p>
+              <p className="text-sm text-slate-500">
+                Overview
+              </p>
 
               <h2 className="mt-1 text-3xl font-semibold tracking-tight">
                 Dashboard
@@ -105,35 +58,56 @@ export default function Dashboard() {
 
             {/* Quick Stats */}
             <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-                <p className="text-sm text-slate-500">Total Clients</p>
 
-                <p className="mt-2 text-3xl font-semibold">0</p>
+              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+                <p className="text-sm text-slate-500">
+                  Total Clients
+                </p>
+
+                <p className="mt-2 text-3xl font-semibold">
+                  0
+                </p>
               </div>
 
               <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-                <p className="text-sm text-slate-500">Properties</p>
+                <p className="text-sm text-slate-500">
+                  Properties
+                </p>
 
-                <p className="mt-2 text-3xl font-semibold">0</p>
+                <p className="mt-2 text-3xl font-semibold">
+                  0
+                </p>
               </div>
 
               <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-                <p className="text-sm text-slate-500">Active Follow-ups</p>
+                <p className="text-sm text-slate-500">
+                  Active Follow-ups
+                </p>
 
-                <p className="mt-2 text-3xl font-semibold">0</p>
+                <p className="mt-2 text-3xl font-semibold">
+                  0
+                </p>
               </div>
 
               <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-                <p className="text-sm text-slate-500">Employees</p>
+                <p className="text-sm text-slate-500">
+                  Employees
+                </p>
 
-                <p className="mt-2 text-3xl font-semibold">0</p>
+                <p className="mt-2 text-3xl font-semibold">
+                  0
+                </p>
               </div>
+
             </div>
 
             {/* Modules */}
             <section>
+
               <div className="mb-4">
-                <h3 className="text-lg font-semibold">Manage BrokerHub</h3>
+                <h3 className="text-lg font-semibold">
+                  Manage BrokerHub
+                </h3>
 
                 <p className="mt-1 text-sm text-slate-500">
                   Choose a section to get started.
@@ -141,19 +115,25 @@ export default function Dashboard() {
               </div>
 
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+
                 {modules.map((module) => (
                   <a
                     key={module.title}
                     href={module.href}
-                    className="group rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition hover:-translate-y-1 hover:border-slate-700 hover:bg-slate-900"
+                    className="group rounded-xl border border-slate-800
+                               bg-slate-900/50 p-6 transition
+                               hover:-translate-y-1
+                               hover:border-slate-700
+                               hover:bg-slate-900"
                   >
+
                     {/* Icon */}
                     <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800 text-2xl">
                       {module.icon}
                     </div>
 
                     {/* Text */}
-                    <h4 className="text-lg font-semibold group-hover:text-blue-400 transition">
+                    <h4 className="text-lg font-semibold transition group-hover:text-blue-400">
                       {module.title}
                     </h4>
 
@@ -162,18 +142,24 @@ export default function Dashboard() {
                     </p>
 
                     {/* Arrow */}
-                    <div className="mt-5 flex items-center gap-2 text-sm font-medium text-slate-400 group-hover:text-blue-400 transition">
+                    <div className="mt-5 flex items-center gap-2 text-sm font-medium text-slate-400 transition group-hover:text-blue-400">
                       Open section
+
                       <span className="transition-transform group-hover:translate-x-1">
                         →
                       </span>
                     </div>
+
                   </a>
                 ))}
+
               </div>
+
             </section>
+
           </div>
         </main>
+
       </div>
     </div>
   );

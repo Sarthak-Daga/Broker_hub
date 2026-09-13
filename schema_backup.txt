@@ -1,0 +1,156 @@
+model Client{
+id Int @id @default(autoincrement())
+name String
+address String
+mobileNumber String
+remarks String?
+marketing Marketing[]
+seller Seller[]
+buyer Buyer[]
+followUp FollowUp[]
+}
+
+model Area{
+id Int @id @default(autoincrement())
+name String
+seller Seller[]
+buyer Buyer[]
+}
+
+enum SellerStatus{
+ UNSOLD
+ SOLD
+}
+
+
+model Seller{
+id Int @id @default(autoincrement())
+clientId Int
+client Client @relation(fields:[clientId] , references:[id])
+areaId Int
+area Area @relation(fields:[areaId] , references:[id])
+length Int
+width Int
+demand Int
+status SellerStatus @default(UNSOLD)
+remarks String?
+}
+
+enum BuyerStatus{
+  NOTPURCHASED
+  PURCHASED
+  CANCELLED
+}
+
+model Buyer{
+id Int @id @default(autoincrement())
+clientId Int
+client Client @relation(fields:[clientId] , references:[id])
+areaId Int
+area Area @relation(fields:[areaId] , references:[id])
+length Int
+width Int
+budget Int
+status BuyerStatus @default(NOTPURCHASED)
+remarks String?
+}
+
+model Colony{
+id Int @id @default(autoincrement())
+name String
+marketing Marketing[]
+wing Wing[]
+}
+
+
+model Employee{
+id Int @id @default(autoincrement())
+name String
+phoneNumber String
+marketing Marketing[]
+followUp FollowUp[]
+}
+
+enum MarketingStatus{
+  NONE
+  CALLED_NOT_VISITED
+  VISITED
+  NOT_INTERESTED
+}
+enum Priority{
+  ONE_STAR
+  TWO_STAR
+  THREE_STAR
+  FOUR_STAR
+  FIVE_STAR
+}
+
+model Marketing{
+id Int @id @default(autoincrement())
+clientId Int
+client Client @relation(fields:[clientId] , references: [id])
+employeeId Int?
+employee Employee? @relation(fields:[employeeId] , references: [id])
+colonyId Int
+colony Colony @relation(fields:[colonyId] , references:[id])
+remarks String?
+status MarketingStatus @default(NONE)
+priority Priority @default(ONE_STAR)
+}
+
+model Wing{
+id Int @id @default(autoincrement())
+colonyId Int
+colony Colony @relation(fields:[colonyId] , references:[id])
+name String
+numberOfFloors Int
+floor Floor[]
+}
+
+model Floor{
+id Int @id @default(autoincrement())
+wingId Int
+wing Wing @relation(fields:[wingId] , references:[id])
+numberOfFlats Int
+flat Flat[]
+}
+
+enum FlatStatus{
+AVAILABLE
+SOLD
+}
+
+model Flat{
+id Int @id @default(autoincrement())
+floorId Int
+floor Floor @relation(fields:[floorId] , references:[id])
+type String
+flatNumber String
+status FlatStatus @default(AVAILABLE)
+}
+
+enum FollowUpStatus{
+PENDING
+DONE
+POSTPONED
+CANCELLED
+}
+
+enum FollowUpPurpose{
+GENERAL
+MARKETING
+BUYER
+SELLER
+}
+
+model FollowUp{
+id Int @id @default(autoincrement())
+clientId Int
+client Client @relation(fields:[clientId] , references:[id])
+employeeId Int
+employee Employee @relation(fields:[employeeId] , references: [id])
+dateTime DateTime
+notes String?
+status FollowUpStatus @default(PENDING)
+purpose FollowUpPurpose @default(GENERAL)
+}
