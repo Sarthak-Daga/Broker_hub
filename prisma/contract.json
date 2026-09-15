@@ -799,7 +799,7 @@
               "dateTime": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/timestamptz-temporal@1",
+                  "codecId": "pg/timestamptz-string@1",
                   "kind": "scalar"
                 }
               },
@@ -1677,7 +1677,7 @@
                   "nullable": false
                 },
                 "dateTime": {
-                  "codecId": "pg/timestamptz-temporal@1",
+                  "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
@@ -2199,7 +2199,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "f6476841b38b63a24990558a0a0b2daf2afc8ae0185d672b05ebe282971725b4"
+    "storageHash": "a10e2272dae5fc15a57982c6fe6530491f8ed4bdd885e3bab72eae4f9357b319"
   },
   "capabilities": {
     "postgres": {

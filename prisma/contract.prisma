@@ -151,7 +151,7 @@ clientId Int
 client Client @relation(fields:[clientId] , references:[id])
 employeeId Int
 employee Employee @relation(fields:[employeeId] , references: [id])
-dateTime DateTime
+dateTime TimestamptzString
 notes String?
 status FollowUpStatus @default(PENDING)
 purpose FollowUpPurpose @default(GENERAL)

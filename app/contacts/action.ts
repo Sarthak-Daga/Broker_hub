@@ -16,7 +16,6 @@ export async function createClient(formData: FormData) {
     remarks,
   });
 
-  console.log(client);
   revalidatePath('/contacts')
 }
 
