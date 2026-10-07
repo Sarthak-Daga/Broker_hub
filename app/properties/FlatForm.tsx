@@ -18,9 +18,10 @@ type Colony = {
 type FlatFormProps = {
   areas: Area[];
   colonies: Colony[];
+  onColonyChange?: (colonyId: number | null) => void;
 };
 
-export default function FlatForm({ areas, colonies }: FlatFormProps) {
+export default function FlatForm({ areas, colonies , onColonyChange }: FlatFormProps) {
   // --------------------------------------------------
   // Selected hierarchy
   // --------------------------------------------------
@@ -102,6 +103,7 @@ export default function FlatForm({ areas, colonies }: FlatFormProps) {
 
       setLocalColonies((current) => [...current, colony]);
       setColonyId(colony.id);
+      onColonyChange?.(colony.id);
 
       setNewColonyName("");
       setAddingColony(false);
@@ -180,6 +182,7 @@ export default function FlatForm({ areas, colonies }: FlatFormProps) {
           value={colonyId}
           onChangeAction={(value) => {
             setColonyId(value);
+            onColonyChange?.(value);
           }}
           placeholder={areaId ? "Search colony..." : "Select an area first"}
           disabled={!areaId}
