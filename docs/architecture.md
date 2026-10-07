@@ -1,6 +1,261 @@
-Yep — here’s **`docs/architecture.md`**, keeping it aligned with the BrokerHub architecture we’ve already established.
+# BrokerHub --- Current Project State Snapshot
 
-```md
+> Updated: 2026-10-07\
+> This section is the authoritative current-state addendum for
+> continuing development. Older sections describe the original
+> requirements and should not override decisions recorded here.
+
+## Current stack
+
+-   Next.js App Router
+-   TypeScript
+-   Tailwind CSS
+-   PostgreSQL in Docker
+-   Prisma 8
+-   Next.js Server Actions for mutations
+-   Dark professional CRM UI
+
+## Current implementation status
+
+### Completed and working
+
+-   Project documentation structure exists: PRD, architecture, rules,
+    design, task, memory.
+-   PostgreSQL/Docker infrastructure is working.
+-   Prisma 8 contract/database workflow is established.
+-   Contacts module is working.
+-   Employees module is working.
+-   Follow-ups module is working, including status transitions, overdue
+    derivation, postponing, cancellation, historical records, and
+    future-date validation.
+-   Properties page exists.
+-   Properties page loads Area, Colony, Wing, Floor, and Flat records.
+-   `PropertyTypeModal` supports choosing Flat vs Plot/Land.
+-   `FlatForm` has cascading searchable selectors.
+-   Area creation through the Flat property flow is implemented and
+    tested successfully.
+-   Colony creation through the same inline pattern is the intended and
+    current creation UX.
+-   `Colony.areaId` has been added to the database and the required
+    migration has been applied successfully.
+-   `Floor.floorNumber` has been added and migrated successfully.
+
+## Property hierarchy decision --- IMPORTANT
+
+The physical hierarchy is:
+
+``` text
+Area
+  ↓
+Colony
+  ↓
+Wing
+  ↓
+Floor
+  ↓
+Flat
+```
+
+However, the creation UX is intentionally NOT generic CRUD at every
+level.
+
+### Inline creation
+
+Only these should use the small searchable-select + inline creation
+pattern in the initial Flat/property flow:
+
+``` text
+Area     → searchable select + New Area
+Colony   → searchable select + New Colony
+```
+
+### Property Structure Generator
+
+Wing, Floor, and Flat creation must use a separate Property Structure
+Generator UI.
+
+Do NOT add: - `+ New Wing` inline under Wing - `+ New Floor` inline
+under Floor - `+ New Flat` inline under Flat
+
+The generator should configure and create the entire physical structure
+for a selected Colony.
+
+## Property Structure Generator --- intended workflow
+
+``` text
+Select Area
+    ↓
+Select/Create Colony
+    ↓
+Configure Property Structure
+    ↓
+Configure Wings
+    ↓
+Configure Floors per Wing
+    ↓
+Configure Flats per Floor
+    ↓
+Review generated structure
+    ↓
+Generate
+```
+
+The generator must support different configurations, for example:
+
+``` text
+Colony: Shantigram
+
+Wing A → 10 floors
+Wing B → 8 floors
+Wing C → 12 floors
+
+Floor 1 of Wing A → 4 flats
+Floor 2 of Wing A → 6 flats
+...
+```
+
+Different wings may have different floor counts, and different floors
+may have different flat counts.
+
+Actual `Wing`, `Floor`, and `Flat` database records are the source of
+truth after generation.
+
+## Important correction to recent implementation
+
+A previous attempted implementation added `createWing`, `createFloor`,
+and `createFlat` as inline creation actions. That was the wrong UX
+direction and should be removed/reverted.
+
+Do not continue or repair that inline creation approach.
+
+The recent `Wing.update({ where: ... })` attempt also exposed that
+mutation API syntax must not be guessed. Once the generator is
+implemented, use the actual Prisma 8 generated API already established
+by the project.
+
+## Current property UI direction
+
+The Properties page should eventually support:
+
+``` text
+Properties
+  ├── All
+  ├── Flats
+  └── Plots / Land
+
++ Add Property
+```
+
+For a Flat:
+
+``` text
+Area
+[ Search area... ]
++ New Area
+
+Colony
+[ Search colony... ]
++ New Colony
+
+[ Configure Property Structure ]
+```
+
+The exact visual design should remain consistent with the existing dark
+BrokerHub design system.
+
+## Important domain distinction
+
+Keep these concepts separate:
+
+1.  Physical property hierarchy:
+
+``` text
+Area → Colony → Wing → Floor → Flat
+```
+
+2.  CRM property records: A Seller record represents a specific property
+    being offered for sale.
+
+3.  Property generation: The generator creates the physical
+    Wing/Floor/Flat structure; it should not silently create Seller
+    records.
+
+This distinction is important for future Buyers/Sellers integration.
+
+## Current immediate next step
+
+Build the Property Structure Generator for a selected Colony.
+
+Before implementing it: 1. Remove/revert the incorrect inline
+`+ New Wing`, `+ New Floor`, and `+ New Flat` UX. 2. Keep the working
+Area and Colony inline creation. 3. Design the generator
+screens/components. 4. Confirm the generator data model and validation.
+5. Generate Wing → Floor → Flat records in a controlled server-side
+operation. 6. Add duplicate-generation protection. 7. Verify the
+generated hierarchy.
+
+## Documentation rule
+
+These six files are version-controlled project documentation and must
+remain committed to Git:
+
+``` text
+docs/prd.md
+docs/architecture.md
+docs/rules.md
+docs/design.md
+docs/task.md
+docs/memory.md
+```
+
+Update them when a major product, architecture, UX, or implementation
+decision changes.
+
+## Current Architecture Addendum --- Property Structure Generator
+
+The Property Structure Generator is a client-side configuration workflow
+backed by a server-side generation action.
+
+Conceptually:
+
+``` text
+Properties Page / Property Modal
+            ↓
+   Generator Client UI
+            ↓
+   Configuration Object
+            ↓
+      Server Action
+            ↓
+   Validate configuration
+            ↓
+   Create Wing records
+            ↓
+   Create Floor records
+            ↓
+   Create Flat records
+            ↓
+     PostgreSQL
+            ↓
+      Revalidate UI
+```
+
+The generator must support per-wing and per-floor configuration rather
+than assuming one global floor count or one global flat count.
+
+The generator should create the physical hierarchy only. CRM
+Seller/Buyer records are separate business entities and should not be
+implicitly created by physical hierarchy generation.
+
+Do not introduce a separate backend service for generation. Keep it
+inside the existing Next.js + Prisma + PostgreSQL architecture.
+
+------------------------------------------------------------------------
+
+Yep --- here's **`docs/architecture.md`**, keeping it aligned with the
+BrokerHub architecture we've already established.
+
+``` md
 # BrokerHub — System Architecture
 
 ## 1. Architecture Overview
@@ -44,55 +299,55 @@ The overall architecture is:
 
 PostgreSQL runs inside Docker during self-hosted deployment.
 
----
+------------------------------------------------------------------------
 
 # 2. Technology Stack
 
 ## Frontend
 
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
+-   Next.js
+-   React
+-   TypeScript
+-   Tailwind CSS
 
 ## Backend
 
-- Next.js App Router
-- React Server Components
-- Next.js Server Actions
+-   Next.js App Router
+-   React Server Components
+-   Next.js Server Actions
 
 ## Database
 
-- PostgreSQL
+-   PostgreSQL
 
 ## ORM / Database Access
 
-- Prisma 8
+-   Prisma 8
 
 ## Containerization
 
-- Docker
-- Docker Compose
+-   Docker
+-   Docker Compose
 
 ## Development Environment
 
-- Node.js
-- npm
+-   Node.js
+-   npm
 
 ## Future Remote Access
 
 Potential options:
 
-- Cloudflare Tunnel
-- Tailscale
+-   Cloudflare Tunnel
+-   Tailscale
 
----
+------------------------------------------------------------------------
 
 # 3. High-Level Application Architecture
 
 BrokerHub follows a layered flow:
 
-```text
+``` text
 User
   │
   ▼
@@ -117,36 +372,36 @@ Next.js UI
 
 Responsible for:
 
-- Displaying data
-- Forms
-- Tables
-- Modals
-- Search interfaces
-- Status controls
-- Navigation
+-   Displaying data
+-   Forms
+-   Tables
+-   Modals
+-   Search interfaces
+-   Status controls
+-   Navigation
 
 ### Server Layer
 
 Responsible for:
 
-- Business logic
-- Validation
-- Mutations
-- Authorization
-- Database operations
-- Revalidation
+-   Business logic
+-   Validation
+-   Mutations
+-   Authorization
+-   Database operations
+-   Revalidation
 
 ### Database Layer
 
 Responsible for:
 
-- Persistent storage
-- Relationships
-- Constraints
-- Historical records
-- Source of truth for business data
+-   Persistent storage
+-   Relationships
+-   Constraints
+-   Historical records
+-   Source of truth for business data
 
----
+------------------------------------------------------------------------
 
 # 4. Next.js Architecture
 
@@ -156,7 +411,7 @@ The application is organized primarily around feature-based routes.
 
 Expected structure:
 
-```text
+``` text
 app/
 ├── dashboard/
 ├── contacts/
@@ -176,7 +431,7 @@ Each major business module has its own route.
 
 Example:
 
-```text
+``` text
 /dashboard
 /contacts
 /employees
@@ -185,15 +440,16 @@ Example:
 /buyers-sellers
 ```
 
----
+------------------------------------------------------------------------
 
 # 5. Server Components
 
-BrokerHub should prefer React Server Components for pages that primarily display database information.
+BrokerHub should prefer React Server Components for pages that primarily
+display database information.
 
 Example flow:
 
-```text
+``` text
 Request
    ↓
 Next.js Server Component
@@ -203,35 +459,37 @@ Database Query
 Render HTML
 ```
 
-This keeps database access on the server and avoids unnecessarily exposing database operations to the browser.
+This keeps database access on the server and avoids unnecessarily
+exposing database operations to the browser.
 
 Examples of suitable Server Components:
 
-- Dashboard
-- Contacts page
-- Employees page
-- Follow-ups page
-- Marketing overview
-- Buyers/Sellers overview
+-   Dashboard
+-   Contacts page
+-   Employees page
+-   Follow-ups page
+-   Marketing overview
+-   Buyers/Sellers overview
 
----
+------------------------------------------------------------------------
 
 # 6. Client Components
 
-Client Components should be used when browser-side interaction is required.
+Client Components should be used when browser-side interaction is
+required.
 
 Examples:
 
-- Modals
-- Search interfaces
-- Interactive forms
-- Date/time selectors
-- Buttons requiring local UI state
-- Navigation requiring `usePathname()`
+-   Modals
+-   Search interfaces
+-   Interactive forms
+-   Date/time selectors
+-   Buttons requiring local UI state
+-   Navigation requiring `usePathname()`
 
 Example:
 
-```text
+``` text
 Contacts Page
       │
       ├── Server Component
@@ -245,7 +503,7 @@ Contacts Page
 
 Client Components should not be used unnecessarily.
 
----
+------------------------------------------------------------------------
 
 # 7. Server Actions
 
@@ -253,7 +511,7 @@ Mutations should use Next.js Server Actions where appropriate.
 
 Typical operations include:
 
-```text
+``` text
 Create
 Update
 Delete
@@ -266,7 +524,7 @@ Cancel Follow-up
 
 Example architecture:
 
-```text
+``` text
 User clicks "Done"
         │
         ▼
@@ -285,9 +543,10 @@ Revalidate relevant route
 Updated UI
 ```
 
-Server-side validation is required even when client-side validation already exists.
+Server-side validation is required even when client-side validation
+already exists.
 
----
+------------------------------------------------------------------------
 
 # 8. Database Architecture
 
@@ -295,27 +554,28 @@ PostgreSQL is the primary source of truth for BrokerHub.
 
 The database stores:
 
-- Clients
-- Areas
-- Employees
-- Marketing relationships
-- Seller properties
-- Buyer requirements
-- Colonies
-- Wings
-- Floors
-- Flats
-- Follow-ups
+-   Clients
+-   Areas
+-   Employees
+-   Marketing relationships
+-   Seller properties
+-   Buyer requirements
+-   Colonies
+-   Wings
+-   Floors
+-   Flats
+-   Follow-ups
 
-The application should not maintain a separate persistent business-data store outside PostgreSQL.
+The application should not maintain a separate persistent business-data
+store outside PostgreSQL.
 
----
+------------------------------------------------------------------------
 
 # 9. Core Database Relationships
 
 The major relationships are:
 
-```text
+``` text
 Client
  ├── Marketing
  ├── Seller
@@ -323,13 +583,13 @@ Client
  └── FollowUp
 ```
 
-```text
+``` text
 Area
  ├── Seller
  └── Buyer
 ```
 
-```text
+``` text
 Colony
  ├── Marketing
  └── Wing
@@ -337,13 +597,13 @@ Colony
              └── Flat
 ```
 
-```text
+``` text
 Employee
  ├── Marketing
  └── FollowUp
 ```
 
----
+------------------------------------------------------------------------
 
 # 10. Client Architecture
 
@@ -351,7 +611,7 @@ The `Client` entity represents the person.
 
 A client may participate in different business workflows.
 
-```text
+``` text
 Client
    │
    ├── Marketing relationships
@@ -365,15 +625,16 @@ Client
 
 This prevents duplication of basic client information.
 
-For example, if one person is both a seller and a buyer, the same Client record can be associated with both workflows.
+For example, if one person is both a seller and a buyer, the same Client
+record can be associated with both workflows.
 
----
+------------------------------------------------------------------------
 
 # 11. Marketing Architecture
 
 Marketing uses a relationship entity between:
 
-```text
+``` text
 Client
    ↕
 Marketing
@@ -385,23 +646,25 @@ This creates a many-to-many relationship between clients and colonies.
 
 Conceptually:
 
-```text
+``` text
 Client A ─── Marketing ─── Colony X
 Client A ─── Marketing ─── Colony Y
 Client B ─── Marketing ─── Colony X
 Client B ─── Marketing ─── Colony Z
 ```
 
-The `Marketing` record additionally stores relationship-specific information such as:
+The `Marketing` record additionally stores relationship-specific
+information such as:
 
-- Employee assignment
-- Status
-- Priority
-- Remarks
+-   Employee assignment
+-   Status
+-   Priority
+-   Remarks
 
-This information belongs to the relationship rather than directly to the Client or Colony.
+This information belongs to the relationship rather than directly to the
+Client or Colony.
 
----
+------------------------------------------------------------------------
 
 # 12. Buyer Architecture
 
@@ -409,7 +672,7 @@ A Client may have multiple buyer requirements.
 
 Therefore:
 
-```text
+``` text
 Client
   │
   ├── Buyer Requirement 1
@@ -419,16 +682,16 @@ Client
 
 Each Buyer record stores:
 
-- Area
-- Length
-- Width
-- Budget
-- Status
-- Remarks
+-   Area
+-   Length
+-   Width
+-   Budget
+-   Status
+-   Remarks
 
 This allows the same person to maintain multiple requirements.
 
----
+------------------------------------------------------------------------
 
 # 13. Seller Architecture
 
@@ -436,7 +699,7 @@ A Client may own multiple properties.
 
 Therefore:
 
-```text
+``` text
 Client
   │
   ├── Seller Property 1
@@ -448,7 +711,7 @@ Each Seller record represents a specific property.
 
 This distinction is important:
 
-```text
+``` text
 Client ID
     =
 Who owns the property?
@@ -460,13 +723,13 @@ Which property is being listed?
 
 The system should therefore not treat the client itself as the property.
 
----
+------------------------------------------------------------------------
 
 # 14. Property Hierarchy Architecture
 
 The property management system follows:
 
-```text
+``` text
 Colony
    │
    └── Wing
@@ -478,7 +741,7 @@ Colony
 
 Database relationships:
 
-```text
+``` text
 Colony
   1
   │
@@ -495,17 +758,19 @@ Floor
   └────── N Flat
 ```
 
-This allows the application to represent real residential projects in a structured manner.
+This allows the application to represent real residential projects in a
+structured manner.
 
----
+------------------------------------------------------------------------
 
 # 15. Property Generation
 
-The application should be able to generate property records based on configuration.
+The application should be able to generate property records based on
+configuration.
 
 Example:
 
-```text
+``` text
 Colony A
 
 3 Wings
@@ -519,7 +784,7 @@ The generator creates the corresponding database records.
 
 Conceptually:
 
-```text
+``` text
 Generator Configuration
           │
           ▼
@@ -532,17 +797,19 @@ Generator Configuration
         Flats
 ```
 
-Actual `Flat` records become the source of truth for property availability.
+Actual `Flat` records become the source of truth for property
+availability.
 
----
+------------------------------------------------------------------------
 
 # 16. Availability Architecture
 
-Property availability should not be stored as a manually maintained count on the Colony.
+Property availability should not be stored as a manually maintained
+count on the Colony.
 
 Instead:
 
-```text
+``` text
 Colony
    ↓
 Wing
@@ -558,26 +825,27 @@ Availability can then be derived from flat records.
 
 For example:
 
-```text
+``` text
 AVAILABLE = count(Flat where status = AVAILABLE)
 ```
 
-This avoids situations where a manually stored availability number becomes inconsistent with the actual properties.
+This avoids situations where a manually stored availability number
+becomes inconsistent with the actual properties.
 
----
+------------------------------------------------------------------------
 
 # 17. Follow-up Architecture
 
 Follow-ups are associated with both:
 
-```text
+``` text
 Client
 Employee
 ```
 
 Relationship:
 
-```text
+``` text
 Client
    │
    └── FollowUp
@@ -587,28 +855,28 @@ Client
 
 Each follow-up stores:
 
-- Client
-- Employee
-- Date/time
-- Notes
-- Purpose
-- Status
+-   Client
+-   Employee
+-   Date/time
+-   Notes
+-   Purpose
+-   Status
 
 This allows the system to answer:
 
-- Which client needs a follow-up?
-- Which employee is responsible?
-- When should it happen?
-- Why is the follow-up required?
-- What is its current state?
+-   Which client needs a follow-up?
+-   Which employee is responsible?
+-   When should it happen?
+-   Why is the follow-up required?
+-   What is its current state?
 
----
+------------------------------------------------------------------------
 
 # 18. Follow-up Lifecycle
 
 The follow-up lifecycle is:
 
-```text
+``` text
                  ┌──────────────┐
                  │   PENDING    │
                  └──────┬───────┘
@@ -626,7 +894,7 @@ The follow-up lifecycle is:
 
 They are not automatically deleted.
 
----
+------------------------------------------------------------------------
 
 # 19. Overdue Follow-ups
 
@@ -636,7 +904,7 @@ It is not stored as a separate database enum.
 
 Logic:
 
-```text
+``` text
 if:
     status == PENDING
     AND
@@ -650,7 +918,7 @@ This prevents stale overdue states from being stored in the database.
 
 For example:
 
-```text
+``` text
 Database:
 
 status = PENDING
@@ -659,11 +927,11 @@ dateTime = yesterday
 
 UI:
 
-```text
+``` text
 OVERDUE
 ```
 
----
+------------------------------------------------------------------------
 
 # 20. Follow-up Date Validation
 
@@ -677,7 +945,7 @@ Prevent the user from selecting a past date/time.
 
 Validate again before modifying the database.
 
-```text
+``` text
 User Input
     │
     ▼
@@ -695,7 +963,7 @@ PostgreSQL
 
 Server-side validation is the authoritative check.
 
----
+------------------------------------------------------------------------
 
 # 21. Employee Architecture
 
@@ -703,7 +971,7 @@ Employees are stored separately from Clients.
 
 An employee can be associated with:
 
-```text
+``` text
 Employee
    ├── Marketing assignments
    └── Follow-ups
@@ -713,12 +981,12 @@ The Employee ID is internally numeric but displayed in a formatted form.
 
 Example:
 
-```text
+``` text
 Database ID: 1
 Displayed ID: 001
 ```
 
----
+------------------------------------------------------------------------
 
 # 22. Authorization Architecture
 
@@ -726,7 +994,7 @@ Authorization should eventually be implemented at the server layer.
 
 The conceptual model is:
 
-```text
+``` text
 Request
    │
    ▼
@@ -746,9 +1014,10 @@ Identify Role
       Operation
 ```
 
-The UI should hide unavailable operations for convenience, but server-side authorization must be the final protection.
+The UI should hide unavailable operations for convenience, but
+server-side authorization must be the final protection.
 
----
+------------------------------------------------------------------------
 
 # 23. Docker Architecture
 
@@ -756,7 +1025,7 @@ PostgreSQL runs inside Docker.
 
 Current architecture:
 
-```text
+``` text
 Docker Host
 │
 └── brokerhub-postgres
@@ -770,13 +1039,13 @@ Docker Compose manages the PostgreSQL service.
 
 The application connects through:
 
-```text
+``` text
 localhost:5432
 ```
 
 during local development.
 
----
+------------------------------------------------------------------------
 
 # 24. Docker Volume
 
@@ -784,18 +1053,19 @@ PostgreSQL data is stored in a Docker named volume.
 
 Conceptually:
 
-```text
+``` text
 PostgreSQL Container
         │
         ▼
 postgres_data
 ```
 
-This allows the database container to be recreated without losing persistent database data.
+This allows the database container to be recreated without losing
+persistent database data.
 
 The database itself remains the source of truth.
 
----
+------------------------------------------------------------------------
 
 # 25. Prisma Architecture
 
@@ -803,7 +1073,7 @@ Prisma provides the application's database access layer.
 
 The architecture is:
 
-```text
+``` text
 Next.js
    │
    ▼
@@ -813,17 +1083,19 @@ Prisma
 PostgreSQL
 ```
 
-The application should interact with the database through the centralized Prisma database client rather than creating independent database connections throughout the application.
+The application should interact with the database through the
+centralized Prisma database client rather than creating independent
+database connections throughout the application.
 
 Current Prisma 8 setup uses the generated contract/runtime architecture.
 
----
+------------------------------------------------------------------------
 
-# 26. Data Flow — Reading Data
+# 26. Data Flow --- Reading Data
 
 Example: Dashboard.
 
-```text
+``` text
 Browser
    │
    ▼
@@ -849,13 +1121,13 @@ Dashboard
 
 The database is queried on the server.
 
----
+------------------------------------------------------------------------
 
-# 27. Data Flow — Creating Data
+# 27. Data Flow --- Creating Data
 
 Example: Creating a contact.
 
-```text
+``` text
 User
   │
   ▼
@@ -883,13 +1155,13 @@ revalidatePath()
 Updated Contacts Page
 ```
 
----
+------------------------------------------------------------------------
 
-# 28. Data Flow — Updating Status
+# 28. Data Flow --- Updating Status
 
 Example: Completing a follow-up.
 
-```text
+``` text
 User clicks "Done"
         │
         ▼
@@ -913,13 +1185,13 @@ UI refreshes
 
 The record remains in the database as historical data.
 
----
+------------------------------------------------------------------------
 
 # 29. Application Structure
 
 The intended project structure is approximately:
 
-```text
+``` text
 broker_hub/
 │
 ├── app/
@@ -959,13 +1231,13 @@ broker_hub/
 
 The exact structure may evolve as the application grows.
 
----
+------------------------------------------------------------------------
 
 # 30. Deployment Architecture
 
 ## Development
 
-```text
+``` text
 Developer PC
 │
 ├── Next.js Dev Server
@@ -977,17 +1249,18 @@ Developer PC
 
 The developer accesses the application locally:
 
-```text
+``` text
 localhost:3000
 ```
 
----
+------------------------------------------------------------------------
 
 ## Self-Hosted Production
 
-The initial production deployment is intended to run on the Owner's laptop.
+The initial production deployment is intended to run on the Owner's
+laptop.
 
-```text
+``` text
 Internet
    │
    ▼
@@ -1003,13 +1276,13 @@ Owner Laptop
         └── PostgreSQL
 ```
 
----
+------------------------------------------------------------------------
 
 ## Future Raspberry Pi Deployment
 
 The architecture should allow migration to:
 
-```text
+``` text
 Internet
    │
    ▼
@@ -1025,9 +1298,10 @@ Raspberry Pi
         └── PostgreSQL
 ```
 
-A USB SSD may be used for persistent database storage when moving to Raspberry Pi.
+A USB SSD may be used for persistent database storage when moving to
+Raspberry Pi.
 
----
+------------------------------------------------------------------------
 
 # 31. Remote Access
 
@@ -1035,7 +1309,7 @@ PostgreSQL must never be exposed directly to the internet.
 
 The intended remote-access flow is:
 
-```text
+``` text
 User Browser
      │
      ▼
@@ -1051,18 +1325,18 @@ BrokerHub Server
 
 Potential technologies:
 
-- Cloudflare Tunnel
-- Tailscale
+-   Cloudflare Tunnel
+-   Tailscale
 
 The database remains accessible only to the application/server.
 
----
+------------------------------------------------------------------------
 
 # 32. Security Boundaries
 
 The system should maintain the following boundary:
 
-```text
+``` text
              PUBLIC
                 │
                 ▼
@@ -1084,13 +1358,13 @@ Database credentials should remain server-side.
 
 Environment variables such as:
 
-```text
+``` text
 DATABASE_URL
 ```
 
 must not be committed to Git.
 
----
+------------------------------------------------------------------------
 
 # 33. Caching and Revalidation
 
@@ -1098,7 +1372,7 @@ BrokerHub uses Next.js revalidation after mutations.
 
 Typical flow:
 
-```text
+``` text
 Mutation
    │
    ▼
@@ -1113,17 +1387,18 @@ Next.js fetches current database state
 
 Examples:
 
-```text
+``` text
 revalidatePath("/contacts")
 revalidatePath("/employees")
 revalidatePath("/follow-ups")
 ```
 
-When a mutation affects multiple modules, all relevant paths should be revalidated.
+When a mutation affects multiple modules, all relevant paths should be
+revalidated.
 
 For example, creating a follow-up may require:
 
-```text
+``` text
 /follow-ups
 /employees
 /dashboard
@@ -1131,7 +1406,7 @@ For example, creating a follow-up may require:
 
 to reflect the updated state.
 
----
+------------------------------------------------------------------------
 
 # 34. Search Architecture
 
@@ -1139,7 +1414,7 @@ For the expected initial dataset size, search can remain simple.
 
 Example:
 
-```text
+``` text
 Database Records
        │
        ▼
@@ -1152,11 +1427,13 @@ Client-side Search
 Filtered Results
 ```
 
-This approach is acceptable for small datasets such as approximately 100–200 clients.
+This approach is acceptable for small datasets such as approximately
+100--200 clients.
 
-As the dataset grows significantly, server-side filtering and database indexing can be introduced.
+As the dataset grows significantly, server-side filtering and database
+indexing can be introduced.
 
----
+------------------------------------------------------------------------
 
 # 35. Matching Architecture
 
@@ -1164,7 +1441,7 @@ The first version of buyer-seller matching should remain rule-based.
 
 Conceptually:
 
-```text
+``` text
 Buyer Requirement
         │
         ├── Area
@@ -1184,15 +1461,15 @@ Potential Matches
 
 Future versions may introduce:
 
-- Ranking
-- Approximate dimension matching
-- Price tolerance
-- Preference weighting
-- Match scores
+-   Ranking
+-   Approximate dimension matching
+-   Price tolerance
+-   Preference weighting
+-   Match scores
 
 These should not complicate the initial implementation.
 
----
+------------------------------------------------------------------------
 
 # 36. Architectural Principles
 
@@ -1208,17 +1485,18 @@ Client-side checks improve UX but cannot replace server-side validation.
 
 ### 3. Keep the architecture simple
 
-The application is designed for a small business and should not introduce enterprise complexity without a real requirement.
+The application is designed for a small business and should not
+introduce enterprise complexity without a real requirement.
 
 ### 4. Prefer reusable components
 
 Shared UI elements such as:
 
-- Header
-- Sidebar
-- Modals
-- Buttons
-- Status badges
+-   Header
+-   Sidebar
+-   Modals
+-   Buttons
+-   Status badges
 
 should be reused where practical.
 
@@ -1236,19 +1514,22 @@ Important historical records should not disappear automatically.
 
 ### 7. Protect the database
 
-PostgreSQL must remain private and accessible only through the application/server.
+PostgreSQL must remain private and accessible only through the
+application/server.
 
 ### 8. Design for migration
 
-The system should be capable of moving from a development machine to a laptop and eventually to a Raspberry Pi with minimal architectural changes.
+The system should be capable of moving from a development machine to a
+laptop and eventually to a Raspberry Pi with minimal architectural
+changes.
 
----
+------------------------------------------------------------------------
 
 # 37. Final Architecture
 
 The complete intended architecture can be summarized as:
 
-```text
+``` text
                          ┌──────────────────────┐
                          │      User Browser    │
                          │                      │
@@ -1293,7 +1574,7 @@ The complete intended architecture can be summarized as:
 
 The architecture intentionally keeps the system compact:
 
-```text
+``` text
 Next.js
    ↓
 Prisma
@@ -1303,5 +1584,6 @@ PostgreSQL
 Docker
 ```
 
-This provides a practical foundation for BrokerHub while leaving room for authentication, advanced matching, notifications, analytics, and migration to dedicated self-hosted hardware in future versions.
-```
+This provides a practical foundation for BrokerHub while leaving room
+for authentication, advanced matching, notifications, analytics, and
+migration to dedicated self-hosted hardware in future versions. \`\`\`

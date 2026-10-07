@@ -219,6 +219,21 @@
                   "namespace": "public"
                 }
               },
+              "colony": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "areaId"
+                  ]
+                },
+                "to": {
+                  "model": "Colony",
+                  "namespace": "public"
+                }
+              },
               "seller": {
                 "cardinality": "1:N",
                 "on": {
@@ -500,6 +515,13 @@
           },
           "Colony": {
             "fields": {
+              "areaId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -516,6 +538,21 @@
               }
             },
             "relations": {
+              "area": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "areaId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Area",
+                  "namespace": "public"
+                }
+              },
               "marketing": {
                 "cardinality": "1:N",
                 "on": {
@@ -549,6 +586,9 @@
             },
             "storage": {
               "fields": {
+                "areaId": {
+                  "column": "areaId"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -717,6 +757,13 @@
           },
           "Floor": {
             "fields": {
+              "floorNumber": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -773,6 +820,9 @@
             },
             "storage": {
               "fields": {
+                "floorNumber": {
+                  "column": "floorNumber"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -1461,6 +1511,11 @@
             },
             "colony": {
               "columns": {
+                "areaId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -1476,8 +1531,34 @@
                   "nullable": false
                 }
               },
-              "foreignKeys": [],
-              "indexes": [],
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "areaId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "colony"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "area"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "areaId"
+                  ],
+                  "name": "colony_areaId_idx_abf7188c",
+                  "prefix": "colony_areaId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -1602,6 +1683,11 @@
             },
             "floor": {
               "columns": {
+                "floorNumber": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -2199,7 +2285,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a10e2272dae5fc15a57982c6fe6530491f8ed4bdd885e3bab72eae4f9357b319"
+    "storageHash": "9c186b7928bb208937363457ed4c6d2a709d581ec80c9d360fa057941953108c"
   },
   "capabilities": {
     "postgres": {

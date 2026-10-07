@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'9c186b7928bb208937363457ed4c6d2a709d581ec80c9d360fa057941953108c'>;
+  StorageHashBase<'f87f92961b58681b3ba290810146629710236689323db6d982790bed93915fca'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -281,7 +281,6 @@ export type FieldOutputTypes = {
     readonly Floor: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly wingId: CodecTypes['pg/int4@1']['output'];
-      readonly floorNumber: CodecTypes['pg/int4@1']['output'];
       readonly numberOfFlats: CodecTypes['pg/int4@1']['output'];
     };
     readonly FollowUp: {
@@ -363,7 +362,6 @@ export type FieldInputTypes = {
     readonly Floor: {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly wingId: CodecTypes['pg/int4@1']['input'];
-      readonly floorNumber: CodecTypes['pg/int4@1']['input'];
       readonly numberOfFlats: CodecTypes['pg/int4@1']['input'];
     };
     readonly FollowUp: {
@@ -443,7 +441,6 @@ export type StorageColumnTypes = {
       readonly type: CodecTypes['pg/text@1']['output'];
     };
     readonly floor: {
-      readonly floorNumber: CodecTypes['pg/int4@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly numberOfFlats: CodecTypes['pg/int4@1']['output'];
       readonly wingId: CodecTypes['pg/int4@1']['output'];
@@ -525,7 +522,6 @@ export type StorageColumnInputTypes = {
       readonly type: CodecTypes['pg/text@1']['input'];
     };
     readonly floor: {
-      readonly floorNumber: CodecTypes['pg/int4@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly numberOfFlats: CodecTypes['pg/int4@1']['input'];
       readonly wingId: CodecTypes['pg/int4@1']['input'];
@@ -884,11 +880,6 @@ type ContractBase = Omit<
                   };
                 };
                 readonly wingId: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                };
-                readonly floorNumber: {
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
                   readonly nullable: false;
@@ -1705,10 +1696,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
-              readonly floorNumber: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
               readonly numberOfFlats: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
@@ -1738,7 +1725,6 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly id: { readonly column: 'id' };
                 readonly wingId: { readonly column: 'wingId' };
-                readonly floorNumber: { readonly column: 'floorNumber' };
                 readonly numberOfFlats: { readonly column: 'numberOfFlats' };
               };
             };

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "column.public.floor.floorNumber",
+    "label": "Add column \"floorNumber\" to \"floor\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "floorNumber",
+        "table": "floor"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"floorNumber\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "floor",
+          "floorNumber"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"floorNumber\"",
+        "sql": "ALTER TABLE \"public\".\"floor\" ADD COLUMN \"floorNumber\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"floorNumber\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "floor",
+          "floorNumber"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.setNotNull.floor.floorNumber",
+    "label": "Set NOT NULL on \"floor\".\"floorNumber\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "floorNumber",
+        "table": "floor"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"floorNumber\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "floor",
+          "floorNumber"
+        ]
+      },
+      {
+        "description": "ensure no NULL values in \"floorNumber\"",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"floor\" WHERE \"floorNumber\" IS NULL) AS \"result\"",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "set NOT NULL on \"floorNumber\"",
+        "sql": "ALTER TABLE \"public\".\"floor\" ALTER COLUMN \"floorNumber\" SET NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"floorNumber\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "floor",
+          "floorNumber",
+          "NO"
+        ]
+      }
+    ]
+  }
+]

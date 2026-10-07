@@ -1,0 +1,173 @@
+[
+  {
+    "id": "column.public.colony.areaId",
+    "label": "Add column \"areaId\" to \"colony\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "areaId",
+        "table": "colony"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"areaId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "colony",
+          "areaId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"areaId\"",
+        "sql": "ALTER TABLE \"public\".\"colony\" ADD COLUMN \"areaId\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"areaId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "colony",
+          "areaId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.setNotNull.colony.areaId",
+    "label": "Set NOT NULL on \"colony\".\"areaId\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "areaId",
+        "table": "colony"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"areaId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "colony",
+          "areaId"
+        ]
+      },
+      {
+        "description": "ensure no NULL values in \"areaId\"",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"colony\" WHERE \"areaId\" IS NULL) AS \"result\"",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "set NOT NULL on \"areaId\"",
+        "sql": "ALTER TABLE \"public\".\"colony\" ALTER COLUMN \"areaId\" SET NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"areaId\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "colony",
+          "areaId",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.colony.colony_areaId_idx_abf7188c",
+    "label": "Create index \"colony_areaId_idx_abf7188c\" on \"colony\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "colony_areaId_idx_abf7188c",
+        "table": "colony"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"colony_areaId_idx_abf7188c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"colony_areaId_idx_abf7188c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"colony_areaId_idx_abf7188c\"",
+        "sql": "CREATE INDEX \"colony_areaId_idx_abf7188c\" ON \"public\".\"colony\" (\"areaId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"colony_areaId_idx_abf7188c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"colony_areaId_idx_abf7188c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.colony.colony_areaId_fkey",
+    "label": "Add foreign key \"colony_areaId_fkey\" on \"colony\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "colony_areaId_fkey",
+        "table": "colony"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"colony_areaId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "colony_areaId_fkey",
+          "public",
+          "\"public\".\"colony\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"colony_areaId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"colony\"\nADD CONSTRAINT \"colony_areaId_fkey\"\nFOREIGN KEY (\"areaId\")\nREFERENCES \"public\".\"area\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"colony_areaId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "colony_areaId_fkey",
+          "public",
+          "\"public\".\"colony\""
+        ]
+      }
+    ]
+  }
+]

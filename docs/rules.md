@@ -1,4 +1,256 @@
-```md
+# BrokerHub --- Current Project State Snapshot
+
+> Updated: 2026-10-07\
+> This section is the authoritative current-state addendum for
+> continuing development. Older sections describe the original
+> requirements and should not override decisions recorded here.
+
+## Current stack
+
+-   Next.js App Router
+-   TypeScript
+-   Tailwind CSS
+-   PostgreSQL in Docker
+-   Prisma 8
+-   Next.js Server Actions for mutations
+-   Dark professional CRM UI
+
+## Current implementation status
+
+### Completed and working
+
+-   Project documentation structure exists: PRD, architecture, rules,
+    design, task, memory.
+-   PostgreSQL/Docker infrastructure is working.
+-   Prisma 8 contract/database workflow is established.
+-   Contacts module is working.
+-   Employees module is working.
+-   Follow-ups module is working, including status transitions, overdue
+    derivation, postponing, cancellation, historical records, and
+    future-date validation.
+-   Properties page exists.
+-   Properties page loads Area, Colony, Wing, Floor, and Flat records.
+-   `PropertyTypeModal` supports choosing Flat vs Plot/Land.
+-   `FlatForm` has cascading searchable selectors.
+-   Area creation through the Flat property flow is implemented and
+    tested successfully.
+-   Colony creation through the same inline pattern is the intended and
+    current creation UX.
+-   `Colony.areaId` has been added to the database and the required
+    migration has been applied successfully.
+-   `Floor.floorNumber` has been added and migrated successfully.
+
+## Property hierarchy decision --- IMPORTANT
+
+The physical hierarchy is:
+
+``` text
+Area
+  ↓
+Colony
+  ↓
+Wing
+  ↓
+Floor
+  ↓
+Flat
+```
+
+However, the creation UX is intentionally NOT generic CRUD at every
+level.
+
+### Inline creation
+
+Only these should use the small searchable-select + inline creation
+pattern in the initial Flat/property flow:
+
+``` text
+Area     → searchable select + New Area
+Colony   → searchable select + New Colony
+```
+
+### Property Structure Generator
+
+Wing, Floor, and Flat creation must use a separate Property Structure
+Generator UI.
+
+Do NOT add: - `+ New Wing` inline under Wing - `+ New Floor` inline
+under Floor - `+ New Flat` inline under Flat
+
+The generator should configure and create the entire physical structure
+for a selected Colony.
+
+## Property Structure Generator --- intended workflow
+
+``` text
+Select Area
+    ↓
+Select/Create Colony
+    ↓
+Configure Property Structure
+    ↓
+Configure Wings
+    ↓
+Configure Floors per Wing
+    ↓
+Configure Flats per Floor
+    ↓
+Review generated structure
+    ↓
+Generate
+```
+
+The generator must support different configurations, for example:
+
+``` text
+Colony: Shantigram
+
+Wing A → 10 floors
+Wing B → 8 floors
+Wing C → 12 floors
+
+Floor 1 of Wing A → 4 flats
+Floor 2 of Wing A → 6 flats
+...
+```
+
+Different wings may have different floor counts, and different floors
+may have different flat counts.
+
+Actual `Wing`, `Floor`, and `Flat` database records are the source of
+truth after generation.
+
+## Important correction to recent implementation
+
+A previous attempted implementation added `createWing`, `createFloor`,
+and `createFlat` as inline creation actions. That was the wrong UX
+direction and should be removed/reverted.
+
+Do not continue or repair that inline creation approach.
+
+The recent `Wing.update({ where: ... })` attempt also exposed that
+mutation API syntax must not be guessed. Once the generator is
+implemented, use the actual Prisma 8 generated API already established
+by the project.
+
+## Current property UI direction
+
+The Properties page should eventually support:
+
+``` text
+Properties
+  ├── All
+  ├── Flats
+  └── Plots / Land
+
++ Add Property
+```
+
+For a Flat:
+
+``` text
+Area
+[ Search area... ]
++ New Area
+
+Colony
+[ Search colony... ]
++ New Colony
+
+[ Configure Property Structure ]
+```
+
+The exact visual design should remain consistent with the existing dark
+BrokerHub design system.
+
+## Important domain distinction
+
+Keep these concepts separate:
+
+1.  Physical property hierarchy:
+
+``` text
+Area → Colony → Wing → Floor → Flat
+```
+
+2.  CRM property records: A Seller record represents a specific property
+    being offered for sale.
+
+3.  Property generation: The generator creates the physical
+    Wing/Floor/Flat structure; it should not silently create Seller
+    records.
+
+This distinction is important for future Buyers/Sellers integration.
+
+## Current immediate next step
+
+Build the Property Structure Generator for a selected Colony.
+
+Before implementing it: 1. Remove/revert the incorrect inline
+`+ New Wing`, `+ New Floor`, and `+ New Flat` UX. 2. Keep the working
+Area and Colony inline creation. 3. Design the generator
+screens/components. 4. Confirm the generator data model and validation.
+5. Generate Wing → Floor → Flat records in a controlled server-side
+operation. 6. Add duplicate-generation protection. 7. Verify the
+generated hierarchy.
+
+## Documentation rule
+
+These six files are version-controlled project documentation and must
+remain committed to Git:
+
+``` text
+docs/prd.md
+docs/architecture.md
+docs/rules.md
+docs/design.md
+docs/task.md
+docs/memory.md
+```
+
+Update them when a major product, architecture, UX, or implementation
+decision changes.
+
+## Current Property UX Rules
+
+### Rule --- Inline creation is intentionally limited
+
+The searchable hierarchy form may provide inline creation for Area and
+Colony.
+
+Do not add generic `+ New` controls for Wing, Floor, and Flat in that
+form.
+
+### Rule --- Use the generator for physical structure creation
+
+Wing, Floor, and Flat records are generated through the Property
+Structure Generator.
+
+### Rule --- Preserve per-level configuration
+
+The generator must allow: - different floor counts for different wings -
+different flat counts for different floors - per-flat type configuration
+where required
+
+### Rule --- Review before destructive/large creation
+
+Generating a structure may create many records. The UI should show a
+review/summary before the final generation action.
+
+### Rule --- Avoid duplicate generation
+
+The generator must validate whether the selected Colony already has a
+physical structure and should warn or block duplicate generation
+according to the final business rule.
+
+### Rule --- Do not conflate physical inventory with CRM listings
+
+Generating a Flat does not mean creating a Seller record. Physical
+inventory and CRM seller properties are separate concepts.
+
+------------------------------------------------------------------------
+
+``` md
 # BrokerHub — Development Rules
 
 This document contains the development rules and guardrails for BrokerHub.
@@ -36,15 +288,15 @@ PostgreSQL
 Docker
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 2 — Build for the actual business
+## Rule 2 --- Build for the actual business
 
 Every feature should solve a real business problem.
 
 Before implementing a new feature, ask:
 
-```text
+``` text
 Does the Owner need this?
 
 Does an Employee need this?
@@ -58,40 +310,43 @@ Does it improve client/property management?
 
 Avoid adding features simply because they are technically interesting.
 
----
+------------------------------------------------------------------------
 
-## Rule 3 — Do not over-engineer
+## Rule 3 --- Do not over-engineer
 
 Prefer the simplest solution that correctly solves the problem.
 
 For example:
 
-- Simple search is sufficient for ~100–200 clients.
-- Simple rule-based matching is sufficient initially.
-- Follow-ups do not require a separate notification infrastructure.
-- PostgreSQL is sufficient for the expected scale.
+-   Simple search is sufficient for \~100--200 clients.
+-   Simple rule-based matching is sufficient initially.
+-   Follow-ups do not require a separate notification infrastructure.
+-   PostgreSQL is sufficient for the expected scale.
 
-Advanced solutions can be introduced when actual requirements justify them.
+Advanced solutions can be introduced when actual requirements justify
+them.
 
----
+------------------------------------------------------------------------
 
 # 2. Database Rules
 
-## Rule 4 — PostgreSQL is the source of truth
+## Rule 4 --- PostgreSQL is the source of truth
 
 Persistent business data must be stored in PostgreSQL.
 
-Do not create a second persistent data source for the same business information without a clear reason.
+Do not create a second persistent data source for the same business
+information without a clear reason.
 
----
+------------------------------------------------------------------------
 
-## Rule 5 — Use Prisma for database access
+## Rule 5 --- Use Prisma for database access
 
-Application code should access PostgreSQL through the centralized Prisma database layer.
+Application code should access PostgreSQL through the centralized Prisma
+database layer.
 
 Preferred:
 
-```text
+``` text
 Next.js
    ↓
 Prisma
@@ -99,17 +354,18 @@ Prisma
 PostgreSQL
 ```
 
-Avoid scattering independent database connections throughout the application.
+Avoid scattering independent database connections throughout the
+application.
 
----
+------------------------------------------------------------------------
 
-## Rule 6 — Preserve relationships
+## Rule 6 --- Preserve relationships
 
 Database relationships should represent actual business relationships.
 
 Examples:
 
-```text
+``` text
 Client → Seller
 Client → Buyer
 Client → FollowUp
@@ -122,24 +378,25 @@ Floor → Flat
 
 Do not duplicate data unnecessarily.
 
----
+------------------------------------------------------------------------
 
-## Rule 7 — Client represents the person
+## Rule 7 --- Client represents the person
 
 A Client record represents a person.
 
-Do not create separate copies of the same person's basic information for:
+Do not create separate copies of the same person's basic information
+for:
 
-- Buyer
-- Seller
-- Marketing
-- Follow-up
+-   Buyer
+-   Seller
+-   Marketing
+-   Follow-up
 
 Instead, reference the Client.
 
----
+------------------------------------------------------------------------
 
-## Rule 8 — Buyer represents a requirement
+## Rule 8 --- Buyer represents a requirement
 
 A Buyer record represents a specific buying requirement.
 
@@ -147,7 +404,7 @@ One Client may have multiple Buyer records.
 
 Example:
 
-```text
+``` text
 Client A
  ├── Buyer Requirement 1
  ├── Buyer Requirement 2
@@ -156,9 +413,9 @@ Client A
 
 Do not assume one client can only have one requirement.
 
----
+------------------------------------------------------------------------
 
-## Rule 9 — Seller represents a property
+## Rule 9 --- Seller represents a property
 
 A Seller record represents a specific property.
 
@@ -166,7 +423,7 @@ One Client may have multiple Seller records.
 
 Example:
 
-```text
+``` text
 Client A
  ├── Property 1
  ├── Property 2
@@ -175,15 +432,15 @@ Client A
 
 Do not treat the Client record itself as the property.
 
----
+------------------------------------------------------------------------
 
 # 3. Marketing Rules
 
-## Rule 10 — Marketing is a relationship
+## Rule 10 --- Marketing is a relationship
 
 Marketing records represent a relationship between:
 
-```text
+``` text
 Client
    ↕
 Marketing
@@ -195,15 +452,16 @@ A client may be interested in multiple colonies.
 
 A colony may have multiple interested clients.
 
----
+------------------------------------------------------------------------
 
-## Rule 11 — Marketing status belongs to the relationship
+## Rule 11 --- Marketing status belongs to the relationship
 
-The marketing status belongs to the specific Client–Colony relationship.
+The marketing status belongs to the specific Client--Colony
+relationship.
 
 Example:
 
-```text
+``` text
 Client A
  ├── Colony X → VISITED
  └── Colony Y → CALLED_NOT_VISITED
@@ -211,13 +469,13 @@ Client A
 
 Do not store one global marketing status on the Client.
 
----
+------------------------------------------------------------------------
 
-## Rule 12 — Marketing status must not move backwards
+## Rule 12 --- Marketing status must not move backwards
 
 The intended workflow is:
 
-```text
+``` text
 NONE
   ↓
 CALLED_NOT_VISITED
@@ -229,35 +487,36 @@ A status should not casually move backwards.
 
 `NOT_INTERESTED` is retained as a meaningful historical state.
 
----
+------------------------------------------------------------------------
 
-## Rule 13 — Employee assignment is Owner-controlled
+## Rule 13 --- Employee assignment is Owner-controlled
 
 Only the Owner can:
 
-- Assign employees
-- Change assignments
-- Remove assignments
+-   Assign employees
+-   Change assignments
+-   Remove assignments
 
 Employees cannot change assignments.
 
----
+------------------------------------------------------------------------
 
-## Rule 14 — Employees only modify assigned marketing leads
+## Rule 14 --- Employees only modify assigned marketing leads
 
-Employees may update the status of marketing relationships assigned to them.
+Employees may update the status of marketing relationships assigned to
+them.
 
 They should not be able to modify another employee's assignments.
 
----
+------------------------------------------------------------------------
 
 # 4. Property Rules
 
-## Rule 15 — Maintain the property hierarchy
+## Rule 15 --- Maintain the property hierarchy
 
 The property hierarchy is:
 
-```text
+``` text
 Colony
    ↓
 Wing
@@ -269,9 +528,9 @@ Flat
 
 Do not bypass this hierarchy without a genuine requirement.
 
----
+------------------------------------------------------------------------
 
-## Rule 16 — Store actual Flat records
+## Rule 16 --- Store actual Flat records
 
 Individual flats should be represented as database records.
 
@@ -279,7 +538,7 @@ Do not rely exclusively on calculated counts.
 
 Example:
 
-```text
+``` text
 Flat 101
 Flat 102
 Flat 103
@@ -287,49 +546,51 @@ Flat 103
 
 Each can independently have:
 
-- Type
-- Number
-- Status
+-   Type
+-   Number
+-   Status
 
----
+------------------------------------------------------------------------
 
-## Rule 17 — Flat status is the source of availability
+## Rule 17 --- Flat status is the source of availability
 
 Property availability should be derived from individual Flat records.
 
 For example:
 
-```text
+``` text
 AVAILABLE flats
 =
 count(Flat where status = AVAILABLE)
 ```
 
-Do not maintain a separate manually edited colony availability number unless there is a future requirement for it.
+Do not maintain a separate manually edited colony availability number
+unless there is a future requirement for it.
 
----
+------------------------------------------------------------------------
 
-## Rule 18 — Flat type belongs to Flat
+## Rule 18 --- Flat type belongs to Flat
 
 Examples:
 
-```text
+``` text
 1BHK
 2BHK
 3BHK
 ```
 
-The system should not assume that every flat in a floor has the same type.
+The system should not assume that every flat in a floor has the same
+type.
 
----
+------------------------------------------------------------------------
 
-## Rule 19 — Support different wing configurations
+## Rule 19 --- Support different wing configurations
 
 Different wings may have different numbers of floors.
 
 Example:
 
-```text
+``` text
 Wing A → 10 floors
 Wing B → 8 floors
 Wing C → 12 floors
@@ -337,40 +598,40 @@ Wing C → 12 floors
 
 The property generator must support this.
 
----
+------------------------------------------------------------------------
 
 # 5. Buyer and Seller Rules
 
-## Rule 20 — Dimensions are explicit
+## Rule 20 --- Dimensions are explicit
 
 Seller and Buyer records store:
 
-```text
+``` text
 Length
 Width
 ```
 
 Area is calculated as:
 
-```text
+``` text
 Length × Width
 ```
 
 Example:
 
-```text
+``` text
 30 × 40 = 1200 sq ft
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 21 — Seller demand is per square foot
+## Rule 21 --- Seller demand is per square foot
 
 Seller demand represents the asking rate per square foot.
 
 Example:
 
-```text
+``` text
 Area = 1200 sq ft
 Demand = ₹200/sq ft
 
@@ -379,72 +640,75 @@ Total = ₹2,40,000
 
 The UI may calculate and display the total value.
 
----
+------------------------------------------------------------------------
 
-## Rule 22 — Do not assume property uniqueness
+## Rule 22 --- Do not assume property uniqueness
 
 Do not enforce uniqueness based only on:
 
-```text
+``` text
 Client
 Area
 Length
 Width
 ```
 
-The same client may legitimately have multiple properties with identical dimensions.
+The same client may legitimately have multiple properties with identical
+dimensions.
 
-If necessary, the UI may warn the user that a similar property already exists.
+If necessary, the UI may warn the user that a similar property already
+exists.
 
 The warning should not automatically prevent creation.
 
----
+------------------------------------------------------------------------
 
-## Rule 23 — Buyer and seller matching starts simple
+## Rule 23 --- Buyer and seller matching starts simple
 
 Initial matching may use:
 
-- Same area
-- Compatible dimensions
-- Available seller property
-- Seller property not marked SOLD
-- Buyer budget compatibility
+-   Same area
+-   Compatible dimensions
+-   Available seller property
+-   Seller property not marked SOLD
+-   Buyer budget compatibility
 
 Do not introduce AI or complex ranking unless explicitly required.
 
----
+------------------------------------------------------------------------
 
 # 6. Property Subdivision Rules
 
-## Rule 24 — Do not implement automatic geometry initially
+## Rule 24 --- Do not implement automatic geometry initially
 
 For the first version, property subdivision is handled manually.
 
 Example:
 
-```text
+``` text
 Original:
 30 × 100
 ```
 
 becomes:
 
-```text
+``` text
 30 × 25
 30 × 75
 ```
 
 The application may create new seller records for the resulting pieces.
 
----
+------------------------------------------------------------------------
 
-## Rule 25 — Preserve the original property history
+## Rule 25 --- Preserve the original property history
 
-When a property is subdivided, the original record should not simply disappear.
+When a property is subdivided, the original record should not simply
+disappear.
 
 It should be marked appropriately, such as:
 
-```text
+``` text
 SOLD
 ```
 
@@ -452,48 +716,48 @@ or another future unavailable state.
 
 The resulting pieces can then be represented as new records.
 
----
+------------------------------------------------------------------------
 
 # 7. Follow-up Rules
 
-## Rule 26 — Follow-ups are first-class records
+## Rule 26 --- Follow-ups are first-class records
 
 Follow-ups must be represented by their own database entity.
 
 A FollowUp belongs to:
 
-```text
+``` text
 Client
 Employee
 ```
 
 and contains:
 
-```text
+``` text
 Date/time
 Notes
 Purpose
 Status
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 27 — Active follow-ups
+## Rule 27 --- Active follow-ups
 
 Only these statuses are considered active:
 
-```text
+``` text
 PENDING
 POSTPONED
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 28 — Historical follow-ups
+## Rule 28 --- Historical follow-ups
 
 These statuses are considered historical:
 
-```text
+``` text
 DONE
 CANCELLED
 ```
@@ -502,23 +766,24 @@ Historical follow-ups should remain in the database.
 
 They should not automatically be deleted.
 
----
+------------------------------------------------------------------------
 
-## Rule 29 — Deletion must be explicit
+## Rule 29 --- Deletion must be explicit
 
 Historical follow-ups may be deleted manually.
 
 Deletion should happen only through an explicit user action.
 
-Important historical data must never disappear simply because a follow-up was completed.
+Important historical data must never disappear simply because a
+follow-up was completed.
 
----
+------------------------------------------------------------------------
 
-## Rule 30 — DONE means completed
+## Rule 30 --- DONE means completed
 
 When a user marks a follow-up as Done:
 
-```text
+``` text
 status = DONE
 ```
 
@@ -526,13 +791,13 @@ The record must remain in the database.
 
 Do not delete it.
 
----
+------------------------------------------------------------------------
 
-## Rule 31 — CANCELLED means cancelled
+## Rule 31 --- CANCELLED means cancelled
 
 When a user cancels a follow-up:
 
-```text
+``` text
 status = CANCELLED
 ```
 
@@ -540,15 +805,15 @@ The record must remain in the database.
 
 Do not delete it automatically.
 
----
+------------------------------------------------------------------------
 
-## Rule 32 — OVERDUE is derived
+## Rule 32 --- OVERDUE is derived
 
 Do not create a separate database status called `OVERDUE`.
 
 A follow-up is overdue when:
 
-```text
+``` text
 status = PENDING
 AND
 dateTime < current time
@@ -556,32 +821,33 @@ dateTime < current time
 
 The UI should display:
 
-```text
+``` text
 OVERDUE
 ```
 
 but the database should continue to store:
 
-```text
+``` text
 PENDING
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 33 — Follow-up date must be in the future
+## Rule 33 --- Follow-up date must be in the future
 
-When creating or rescheduling an active follow-up, the selected date/time must be in the future.
+When creating or rescheduling an active follow-up, the selected
+date/time must be in the future.
 
 This applies to:
 
-- Creating
-- Editing
-- Postponing
-- Restoring to Pending
+-   Creating
+-   Editing
+-   Postponing
+-   Restoring to Pending
 
----
+------------------------------------------------------------------------
 
-## Rule 34 — Validate dates on the server
+## Rule 34 --- Validate dates on the server
 
 Client-side validation is useful for UX but is not sufficient.
 
@@ -589,7 +855,7 @@ The Server Action must independently validate the date.
 
 Example:
 
-```text
+``` text
 User Input
     ↓
 Client Validation
@@ -601,15 +867,15 @@ Server Validation
 Database
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 35 — Follow-up sorting
+## Rule 35 --- Follow-up sorting
 
 Follow-ups should be ordered by urgency.
 
 Preferred order:
 
-```text
+``` text
 Overdue Pending
 Pending
 Postponed
@@ -619,29 +885,29 @@ Cancelled
 
 Within each status group, sort by date/time.
 
----
+------------------------------------------------------------------------
 
-## Rule 36 — Employee follow-up count means active work
+## Rule 36 --- Employee follow-up count means active work
 
 Employee follow-up counts should include:
 
-```text
+``` text
 PENDING
 POSTPONED
 ```
 
 and exclude:
 
-```text
+``` text
 DONE
 CANCELLED
 ```
 
----
+------------------------------------------------------------------------
 
 # 8. Employee Rules
 
-## Rule 37 — Employee IDs are formatted for display
+## Rule 37 --- Employee IDs are formatted for display
 
 Database IDs remain numeric.
 
@@ -649,61 +915,61 @@ The UI should display employee IDs as three-digit values.
 
 Example:
 
-```text
+``` text
 1   → 001
 2   → 002
 15  → 015
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 38 — Employee administration is Owner-controlled
+## Rule 38 --- Employee administration is Owner-controlled
 
 Only the Owner should manage employee records.
 
 This includes:
 
-- Add employee
-- Remove employee
-- Modify employee information
-- Assign employees
+-   Add employee
+-   Remove employee
+-   Modify employee information
+-   Assign employees
 
----
+------------------------------------------------------------------------
 
-## Rule 39 — Employees have restricted permissions
+## Rule 39 --- Employees have restricted permissions
 
 Employees should not be able to:
 
-- Add clients
-- Delete clients
-- Add colonies
-- Delete colonies
-- Assign employees
-- Modify other employee assignments
+-   Add clients
+-   Delete clients
+-   Add colonies
+-   Delete colonies
+-   Assign employees
+-   Modify other employee assignments
 
 Final enforcement must happen on the server.
 
----
+------------------------------------------------------------------------
 
 # 9. Contacts Rules
 
-## Rule 40 — Contacts are general business contacts
+## Rule 40 --- Contacts are general business contacts
 
 A Contact is intended for people who are not necessarily active:
 
-- Buyers
-- Sellers
-- Marketing leads
+-   Buyers
+-   Sellers
+-   Marketing leads
 
 They may be retained for future opportunities.
 
----
+------------------------------------------------------------------------
 
-## Rule 41 — Contact fields
+## Rule 41 --- Contact fields
 
 The current Contact information is:
 
-```text
+``` text
 Name
 Address
 Mobile Number
@@ -712,28 +978,28 @@ Remarks
 
 Remarks are optional.
 
----
+------------------------------------------------------------------------
 
-## Rule 42 — Keep Contact management simple
+## Rule 42 --- Keep Contact management simple
 
 The Contacts module should support:
 
-- Create
-- View
-- Search
-- Delete
+-   Create
+-   View
+-   Search
+-   Delete
 
 Additional complexity should only be introduced when required.
 
----
+------------------------------------------------------------------------
 
 # 10. UI Rules
 
-## Rule 43 — Use the established dark theme
+## Rule 43 --- Use the established dark theme
 
 The primary visual language is:
 
-```text
+``` text
 Slate 950
 Slate 900
 Slate 800
@@ -744,28 +1010,29 @@ Slate secondary text
 
 Do not introduce unrelated color schemes on individual pages.
 
----
+------------------------------------------------------------------------
 
-## Rule 44 — Reuse Header and Sidebar
+## Rule 44 --- Reuse Header and Sidebar
 
 All major pages should use the shared:
 
-```text
+``` text
 Header
 Sidebar
 ```
 
 components.
 
-Do not create independent versions of the global navigation for individual pages.
+Do not create independent versions of the global navigation for
+individual pages.
 
----
+------------------------------------------------------------------------
 
-## Rule 45 — Use consistent cards
+## Rule 45 --- Use consistent cards
 
 Cards should generally use:
 
-```text
+``` text
 rounded-xl
 border-slate-800
 bg-slate-900/50
@@ -773,13 +1040,13 @@ bg-slate-900/50
 
 Avoid creating a different card style for every module.
 
----
+------------------------------------------------------------------------
 
-## Rule 46 — Primary actions use blue
+## Rule 46 --- Primary actions use blue
 
 Examples:
 
-```text
+``` text
 + Add Contact
 + Add Employee
 + Add Follow-up
@@ -788,13 +1055,13 @@ Save
 
 should use the primary blue action style.
 
----
+------------------------------------------------------------------------
 
-## Rule 47 — Destructive actions must look destructive
+## Rule 47 --- Destructive actions must look destructive
 
 Examples:
 
-```text
+``` text
 Delete
 Remove
 Cancel
@@ -804,13 +1071,13 @@ should use a danger/red visual treatment where appropriate.
 
 Do not style Delete buttons identically to Save buttons.
 
----
+------------------------------------------------------------------------
 
-## Rule 48 — Status colors must remain consistent
+## Rule 48 --- Status colors must remain consistent
 
 Use consistent semantic meaning:
 
-```text
+``` text
 PENDING     → Blue
 POSTPONED   → Amber
 DONE        → Green
@@ -820,31 +1087,31 @@ OVERDUE     → Red / Attention
 
 Do not randomly change status colors between pages.
 
----
+------------------------------------------------------------------------
 
 # 11. Forms and Modals
 
-## Rule 49 — Keep forms focused
+## Rule 49 --- Keep forms focused
 
 Only ask for information required for the current operation.
 
 Avoid unnecessary fields.
 
----
+------------------------------------------------------------------------
 
-## Rule 50 — Labels must be clear
+## Rule 50 --- Labels must be clear
 
 Every input should have a meaningful label.
 
 Do not rely only on placeholder text.
 
----
+------------------------------------------------------------------------
 
-## Rule 51 — Successful creation should close the modal
+## Rule 51 --- Successful creation should close the modal
 
 After a successful Server Action:
 
-```text
+``` text
 Create
   ↓
 Database
@@ -856,78 +1123,83 @@ Close Modal
 Show updated data
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 52 — Failed operations should not silently disappear
+## Rule 52 --- Failed operations should not silently disappear
 
 If an operation fails, provide useful feedback.
 
-Do not silently close the form while leaving the user uncertain whether the operation succeeded.
+Do not silently close the form while leaving the user uncertain whether
+the operation succeeded.
 
----
+------------------------------------------------------------------------
 
 # 12. Search Rules
 
-## Rule 53 — Keep search simple initially
+## Rule 53 --- Keep search simple initially
 
 The expected dataset is relatively small.
 
 Client-side filtering is acceptable for modules such as Contacts.
 
-Do not introduce Elasticsearch or another search service without a real requirement.
+Do not introduce Elasticsearch or another search service without a real
+requirement.
 
----
+------------------------------------------------------------------------
 
-## Rule 54 — Search should be fast
+## Rule 54 --- Search should be fast
 
-Search fields should update results without requiring unnecessary navigation.
+Search fields should update results without requiring unnecessary
+navigation.
 
----
+------------------------------------------------------------------------
 
 # 13. Security Rules
 
-## Rule 55 — PostgreSQL must remain private
+## Rule 55 --- PostgreSQL must remain private
 
 Never expose PostgreSQL directly to the public internet.
 
 Do not expose port:
 
-```text
+``` text
 5432
 ```
 
 through the public network in production.
 
----
+------------------------------------------------------------------------
 
-## Rule 56 — Never trust client-side authorization
+## Rule 56 --- Never trust client-side authorization
 
 Hiding a button is not authorization.
 
-For example, if an Employee should not assign another employee, the Server Action must reject the request even if the user manually constructs the request.
+For example, if an Employee should not assign another employee, the
+Server Action must reject the request even if the user manually
+constructs the request.
 
----
+------------------------------------------------------------------------
 
-## Rule 57 — Validate Server Actions
+## Rule 57 --- Validate Server Actions
 
 Every mutation should validate:
 
-- IDs
-- Required fields
-- Data types
-- Dates
-- Permissions
-- Business rules
+-   IDs
+-   Required fields
+-   Data types
+-   Dates
+-   Permissions
+-   Business rules
 
 before modifying the database.
 
----
+------------------------------------------------------------------------
 
-## Rule 58 — Protect environment variables
+## Rule 58 --- Protect environment variables
 
 Never commit secrets such as:
 
-```text
+``` text
 DATABASE_URL
 ```
 
@@ -935,29 +1207,29 @@ to Git.
 
 `.env` must remain ignored.
 
----
+------------------------------------------------------------------------
 
-## Rule 59 — Do not log sensitive information unnecessarily
+## Rule 59 --- Do not log sensitive information unnecessarily
 
 Avoid logging:
 
-- Database credentials
-- Authentication secrets
-- Sensitive client information
+-   Database credentials
+-   Authentication secrets
+-   Sensitive client information
 
 unless necessary for debugging.
 
----
+------------------------------------------------------------------------
 
 # 14. Code Organization Rules
 
-## Rule 60 — Keep modules separated
+## Rule 60 --- Keep modules separated
 
 Business logic should remain close to the module that owns it.
 
 Examples:
 
-```text
+``` text
 contacts/
 employees/
 follow-ups/
@@ -967,96 +1239,99 @@ buyers-sellers/
 
 Do not place all business logic into one giant file.
 
----
+------------------------------------------------------------------------
 
-## Rule 61 — Reuse shared UI
+## Rule 61 --- Reuse shared UI
 
 Shared UI belongs in:
 
-```text
+``` text
 app/components/
 ```
 
 Examples:
 
-```text
+``` text
 header.tsx
 sideBar.tsx
 ```
 
 Reusable components should be extracted when they are genuinely shared.
 
----
+------------------------------------------------------------------------
 
-## Rule 62 — Avoid unnecessary abstraction
+## Rule 62 --- Avoid unnecessary abstraction
 
-Do not create a generic abstraction simply because two components currently share a few lines.
+Do not create a generic abstraction simply because two components
+currently share a few lines.
 
 Extract abstractions when they improve:
 
-- Reuse
-- Readability
-- Consistency
-- Maintainability
+-   Reuse
+-   Readability
+-   Consistency
+-   Maintainability
 
----
+------------------------------------------------------------------------
 
-## Rule 63 — Keep Server and Client boundaries intentional
+## Rule 63 --- Keep Server and Client boundaries intentional
 
 Use Server Components by default.
 
-Use Client Components when browser-side state or interaction requires them.
+Use Client Components when browser-side state or interaction requires
+them.
 
-Do not mark an entire page `"use client"` just because one small component needs client-side state.
+Do not mark an entire page `"use client"` just because one small
+component needs client-side state.
 
----
+------------------------------------------------------------------------
 
 # 15. Data Integrity Rules
 
-## Rule 64 — Do not silently lose business data
+## Rule 64 --- Do not silently lose business data
 
 Important business records should not be deleted automatically.
 
 This particularly applies to:
 
-- Completed follow-ups
-- Cancelled follow-ups
-- Sold properties
-- Historical records
+-   Completed follow-ups
+-   Cancelled follow-ups
+-   Sold properties
+-   Historical records
 
----
+------------------------------------------------------------------------
 
-## Rule 65 — Prefer status changes over deletion
+## Rule 65 --- Prefer status changes over deletion
 
 When a record has a meaningful historical state, prefer:
 
-```text
+``` text
 status = DONE
 ```
 
 over:
 
-```text
+``` text
 DELETE
 ```
 
 when appropriate.
 
----
+------------------------------------------------------------------------
 
-## Rule 66 — Do not create duplicate sources of truth
+## Rule 66 --- Do not create duplicate sources of truth
 
 For example:
 
 Do not store:
 
-```text
+``` text
 Colony.availableFlats = 37
 ```
 
 and independently maintain:
 
-```text
+``` text
 37 Flat records
 ```
 
@@ -1064,27 +1339,27 @@ if the count can be derived from the Flat records.
 
 Avoid storing information that can become inconsistent unnecessarily.
 
----
+------------------------------------------------------------------------
 
 # 16. Git Rules
 
-## Rule 67 — Documentation belongs in Git
+## Rule 67 --- Documentation belongs in Git
 
 The following directory should be committed:
 
-```text
+``` text
 docs/
 ```
 
 Do not add it to `.gitignore`.
 
----
+------------------------------------------------------------------------
 
-## Rule 68 — Ignore generated and secret files
+## Rule 68 --- Ignore generated and secret files
 
 The `.gitignore` should include things such as:
 
-```text
+``` text
 node_modules/
 .next/
 .env
@@ -1092,13 +1367,13 @@ node_modules/
 *.log
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 69 — Commit logical checkpoints
+## Rule 69 --- Commit logical checkpoints
 
 Prefer meaningful commits such as:
 
-```text
+``` text
 feat: add contacts module
 feat: add follow-up management
 feat: add employee management
@@ -1109,7 +1384,7 @@ docs: add project documentation
 
 Avoid meaningless commit messages such as:
 
-```text
+``` text
 update
 changes
 stuff
@@ -1117,23 +1392,25 @@ final
 final2
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 70 — Do not commit broken checkpoints intentionally
+## Rule 70 --- Do not commit broken checkpoints intentionally
 
-Before committing a feature, make sure the application is at least in a reasonably working state.
+Before committing a feature, make sure the application is at least in a
+reasonably working state.
 
----
+------------------------------------------------------------------------
 
 # 17. Documentation Rules
 
-## Rule 71 — Keep documentation synchronized
+## Rule 71 --- Keep documentation synchronized
 
-When an important architectural or product decision changes, update the relevant documentation.
+When an important architectural or product decision changes, update the
+relevant documentation.
 
 Potential files:
 
-```text
+``` text
 docs/prd.md
 docs/architecture.md
 docs/rules.md
@@ -1142,13 +1419,13 @@ docs/task.md
 docs/memory.md
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 72 — Do not document features that do not exist
+## Rule 72 --- Do not document features that do not exist
 
 Documentation should distinguish between:
 
-```text
+``` text
 Implemented
 Planned
 Future
@@ -1156,11 +1433,11 @@ Future
 
 Do not describe a future feature as though it already exists.
 
----
+------------------------------------------------------------------------
 
 # 18. Prisma Rules
 
-## Rule 73 — Follow the current Prisma 8 setup
+## Rule 73 --- Follow the current Prisma 8 setup
 
 The project currently uses Prisma 8.
 
@@ -1168,37 +1445,38 @@ Do not blindly apply commands or APIs from older Prisma versions.
 
 The current project uses the Prisma 8 contract/runtime architecture.
 
----
+------------------------------------------------------------------------
 
-## Rule 74 — Keep the Prisma contract as the database definition
+## Rule 74 --- Keep the Prisma contract as the database definition
 
 The main schema definition is:
 
-```text
+``` text
 prisma/contract.prisma
 ```
 
 Database changes should be reflected there.
 
----
+------------------------------------------------------------------------
 
-## Rule 75 — Do not manually modify generated Prisma artifacts unnecessarily
+## Rule 75 --- Do not manually modify generated Prisma artifacts unnecessarily
 
 Generated files should generally be treated as generated output.
 
-Modify the source contract/configuration rather than manually patching generated artifacts unless there is a specific reason.
+Modify the source contract/configuration rather than manually patching
+generated artifacts unless there is a specific reason.
 
----
+------------------------------------------------------------------------
 
 # 19. Performance Rules
 
-## Rule 76 — Optimize for actual scale
+## Rule 76 --- Optimize for actual scale
 
 The initial expected scale is small.
 
 Do not prematurely optimize for:
 
-```text
+``` text
 Millions of clients
 Thousands of employees
 Massive traffic
@@ -1206,31 +1484,32 @@ Massive traffic
 
 Focus on correctness and maintainability first.
 
----
+------------------------------------------------------------------------
 
-## Rule 77 — Avoid unnecessary client-side JavaScript
+## Rule 77 --- Avoid unnecessary client-side JavaScript
 
 Prefer Server Components for static/database-driven pages.
 
 Only introduce client-side interactivity where needed.
 
----
+------------------------------------------------------------------------
 
-## Rule 78 — Avoid unnecessary database queries
+## Rule 78 --- Avoid unnecessary database queries
 
 When implementing a page, retrieve the data actually required.
 
-If multiple related datasets are needed, design the queries intentionally rather than repeatedly fetching the same records.
+If multiple related datasets are needed, design the queries
+intentionally rather than repeatedly fetching the same records.
 
----
+------------------------------------------------------------------------
 
 # 20. UX Rules
 
-## Rule 79 — Important information comes first
+## Rule 79 --- Important information comes first
 
 Pages should prioritize:
 
-```text
+``` text
 Important information
       ↓
 Primary actions
@@ -1240,28 +1519,29 @@ Secondary information
 Historical information
 ```
 
----
+------------------------------------------------------------------------
 
-## Rule 80 — Do not make common actions difficult
+## Rule 80 --- Do not make common actions difficult
 
 Common operations such as:
 
-- Adding a contact
-- Adding a follow-up
-- Completing a follow-up
-- Searching for a client
+-   Adding a contact
+-   Adding a follow-up
+-   Completing a follow-up
+-   Searching for a client
 
 should require minimal interaction.
 
----
+------------------------------------------------------------------------
 
-## Rule 81 — Use confirmation for meaningful deletion
+## Rule 81 --- Use confirmation for meaningful deletion
 
-Deleting meaningful historical information should generally require confirmation.
+Deleting meaningful historical information should generally require
+confirmation.
 
 Example:
 
-```text
+``` text
 Delete Follow-up?
 
 This action cannot be undone.
@@ -1269,33 +1549,34 @@ This action cannot be undone.
 Cancel     Delete
 ```
 
----
+------------------------------------------------------------------------
 
 # 21. Future Feature Rules
 
-## Rule 82 — Do not add future features prematurely
+## Rule 82 --- Do not add future features prematurely
 
 Potential features include:
 
-- Google Calendar
-- Email reminders
-- WhatsApp
-- Advanced matching
-- Analytics
-- Property images
-- Cloud backups
+-   Google Calendar
+-   Email reminders
+-   WhatsApp
+-   Advanced matching
+-   Analytics
+-   Property images
+-   Cloud backups
 
 These should not complicate the initial system unless required.
 
----
+------------------------------------------------------------------------
 
-## Rule 83 — Future features must respect existing architecture
+## Rule 83 --- Future features must respect existing architecture
 
-New features should extend the existing architecture rather than bypassing it.
+New features should extend the existing architecture rather than
+bypassing it.
 
 Preferred:
 
-```text
+``` text
 Next.js
    ↓
 Server Logic
@@ -1305,29 +1586,30 @@ Prisma
 PostgreSQL
 ```
 
----
+------------------------------------------------------------------------
 
 # 22. Architecture Change Rules
 
-## Rule 84 — Question established decisions before changing them
+## Rule 84 --- Question established decisions before changing them
 
-If a change is proposed to an established architecture decision, first determine:
+If a change is proposed to an established architecture decision, first
+determine:
 
-1. What requirement necessitates the change?
-2. Why is the current solution insufficient?
-3. What new complexity will be introduced?
-4. What existing modules will be affected?
-5. Does the benefit justify the complexity?
+1.  What requirement necessitates the change?
+2.  Why is the current solution insufficient?
+3.  What new complexity will be introduced?
+4.  What existing modules will be affected?
+5.  Does the benefit justify the complexity?
 
----
+------------------------------------------------------------------------
 
-## Rule 85 — Update documentation after major changes
+## Rule 85 --- Update documentation after major changes
 
 If an architectural decision changes, update the relevant documentation.
 
 At minimum, consider:
 
-```text
+``` text
 architecture.md
 rules.md
 memory.md
@@ -1335,7 +1617,7 @@ memory.md
 
 Also update:
 
-```text
+``` text
 prd.md
 design.md
 task.md
@@ -1343,13 +1625,13 @@ task.md
 
 when their contents are affected.
 
----
+------------------------------------------------------------------------
 
 # 23. Final Development Principles
 
 BrokerHub development should follow these principles:
 
-```text
+``` text
 1. Keep it simple.
 2. Build for the real business.
 3. PostgreSQL is the source of truth.
@@ -1364,11 +1646,12 @@ BrokerHub development should follow these principles:
 12. Prefer maintainability over cleverness.
 ```
 
----
+------------------------------------------------------------------------
 
 # 24. Golden Rule
 
 When uncertain about an implementation decision:
 
-> **Choose the simplest solution that correctly represents the real business workflow, preserves data integrity, and fits the existing BrokerHub architecture.**
-```
+> **Choose the simplest solution that correctly represents the real
+> business workflow, preserves data integrity, and fits the existing
+> BrokerHub architecture.** \`\`\`

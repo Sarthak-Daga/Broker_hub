@@ -12,11 +12,12 @@ buyer Buyer[]
 followUp FollowUp[]
 }
 
-model Area{
-id Int @id @default(autoincrement())
-name String
-seller Seller[]
-buyer Buyer[]
+model Area {
+  id      Int      @id @default(autoincrement())
+  name    String
+  colony  Colony[]
+  seller  Seller[]
+  buyer   Buyer[]
 }
 
 enum SellerStatus{
@@ -57,11 +58,13 @@ status BuyerStatus @default(NOTPURCHASED)
 remarks String?
 }
 
-model Colony{
-id Int @id @default(autoincrement())
-name String
-marketing Marketing[]
-wing Wing[]
+model Colony {
+  id        Int         @id @default(autoincrement())
+  name      String
+  areaId    Int
+  area      Area        @relation(fields: [areaId], references: [id])
+  marketing Marketing[]
+  wing      Wing[]
 }
 
 
@@ -113,6 +116,7 @@ model Floor{
 id Int @id @default(autoincrement())
 wingId Int
 wing Wing @relation(fields:[wingId] , references:[id])
+floorNumber Int
 numberOfFlats Int
 flat Flat[]
 }

@@ -1,0 +1,6 @@
+when new changes : 
+npx prisma migration status
+npx prisma contract emit
+npx prisma migration log
+npx prisma db verify
+npx prisma migration plan --name add_area_colony_relation
