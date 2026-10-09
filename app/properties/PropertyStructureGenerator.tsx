@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { generatePropertyStructure } from "./action";
 
 type PropertyStructureGeneratorProps = {
   colonyId: number;
@@ -60,6 +61,8 @@ export default function PropertyStructureGenerator({
   const [applyAllWingsOpen, setApplyAllWingsOpen] = useState(false);
   const [allWingFloors, setAllWingFloors] = useState("5");
   const [allWingFlatsPerFloor, setAllWingFlatsPerFloor] = useState("4");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState("");
 
   function getReviewSummary() {
     let totalFloors = 0;
@@ -87,6 +90,43 @@ export default function PropertyStructureGenerator({
       typeCounts,
     };
   }
+  
+  async function handleGenerateStructure() {
+    if (isGenerating) return;
+  
+    setIsGenerating(true);
+    setGenerationError("");
+  
+    try {
+      const result = await generatePropertyStructure({
+        colonyId,
+        wings: wings.map((wing) => ({
+          name: wing.name,
+          floors: (floorsByWing[wing.id] ?? []).map((floor) => ({
+            floorNumber: floor.floorNumber,
+            flats: floor.flats.map((flat) => ({
+              flatNumber: flat.flatNumber,
+              type: flat.type,
+            })),
+          })),
+        })),
+      });
+  
+      console.log("Property structure generated:", result);
+      onClose();
+    } catch (error) {
+      console.error("Failed to generate property structure:", error);
+  
+      setGenerationError(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate property structure. Please try again.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
   function applyToAllWings() {
     const floors = Number(allWingFloors);
     const flatsPerFloor = Number(allWingFlatsPerFloor);
@@ -696,6 +736,14 @@ export default function PropertyStructureGenerator({
               )}
             </div>
           )}
+          {generationError && (
+            <div
+              role="alert"
+              className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300"
+            >
+              {generationError}
+            </div>
+          )}
           {step === "review" && (() => {
             const summary = getReviewSummary();
           
@@ -893,32 +941,39 @@ export default function PropertyStructureGenerator({
               {step === "count" ? "Cancel" : "← Back"}
             </button>
 
+            
             <button
               type="button"
+              disabled={isGenerating}
               onClick={() => {
                 if (step === "count") {
                   handleContinue();
                   return;
                 }
-
+            
                 if (step === "wings") {
                   generateFloorsForWings();
                   return;
                 }
-
+            
                 if (step === "flats") {
                   setStep("review");
                   return;
                 }
+            
+                void handleGenerateStructure();
               }}
-              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500"
+              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {step === "flats"
-                ? "Review →"
-                : step === "review"
-                  ? "Generate Structure"
-                  : "Continue →"}
+              {isGenerating
+                ? "Generating..."
+                : step === "flats"
+                  ? "Review →"
+                  : step === "review"
+                    ? "Generate Structure"
+                    : "Continue →"}
             </button>
+
           </div>
         </div> 
       </div>
