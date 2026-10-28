@@ -1,0 +1,416 @@
+[
+  {
+    "id": "dropCheckConstraint.flat.flat_status_check_2ae4bb86",
+    "label": "Drop check constraint \"flat_status_check_2ae4bb86\" on \"flat\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "flat_status_check_2ae4bb86",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"flat_status_check_2ae4bb86\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_status_check_2ae4bb86",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"flat_status_check_2ae4bb86\"",
+        "sql": "ALTER TABLE \"public\".\"flat\" DROP CONSTRAINT \"flat_status_check_2ae4bb86\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"flat_status_check_2ae4bb86\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_status_check_2ae4bb86",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropCheckConstraint.seller.seller_status_check_1b62e46e",
+    "label": "Drop check constraint \"seller_status_check_1b62e46e\" on \"seller\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "seller_status_check_1b62e46e",
+        "table": "seller"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"seller_status_check_1b62e46e\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_status_check_1b62e46e",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"seller_status_check_1b62e46e\"",
+        "sql": "ALTER TABLE \"public\".\"seller\" DROP CONSTRAINT \"seller_status_check_1b62e46e\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"seller_status_check_1b62e46e\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_status_check_1b62e46e",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.flat.soldByEmployeeId",
+    "label": "Add column \"soldByEmployeeId\" to \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "soldByEmployeeId",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"soldByEmployeeId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "flat",
+          "soldByEmployeeId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"soldByEmployeeId\"",
+        "sql": "ALTER TABLE \"public\".\"flat\" ADD COLUMN \"soldByEmployeeId\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"soldByEmployeeId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "flat",
+          "soldByEmployeeId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.flat.soldToClientId",
+    "label": "Add column \"soldToClientId\" to \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "soldToClientId",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"soldToClientId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "flat",
+          "soldToClientId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"soldToClientId\"",
+        "sql": "ALTER TABLE \"public\".\"flat\" ADD COLUMN \"soldToClientId\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"soldToClientId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "flat",
+          "soldToClientId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.flat.flat_status_check_b0a54f12",
+    "label": "Add check constraint \"flat_status_check_b0a54f12\" on \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "flat_status_check_b0a54f12",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"flat_status_check_b0a54f12\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_status_check_b0a54f12",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"flat_status_check_b0a54f12\"",
+        "sql": "ALTER TABLE \"public\".\"flat\" ADD CONSTRAINT \"flat_status_check_b0a54f12\" CHECK (\"status\" IN ('AVAILABLE', 'UNAVAILABLE', 'SOLD'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"flat_status_check_b0a54f12\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_status_check_b0a54f12",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.seller.seller_status_check_fb15d386",
+    "label": "Add check constraint \"seller_status_check_fb15d386\" on \"seller\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "seller_status_check_fb15d386",
+        "table": "seller"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"seller_status_check_fb15d386\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_status_check_fb15d386",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"seller_status_check_fb15d386\"",
+        "sql": "ALTER TABLE \"public\".\"seller\" ADD CONSTRAINT \"seller_status_check_fb15d386\" CHECK (\"status\" IN ('UNSOLD', 'UNAVAILABLE', 'SOLD'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"seller_status_check_fb15d386\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "seller_status_check_fb15d386",
+          "public",
+          "\"public\".\"seller\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.flat.flat_soldByEmployeeId_idx_a6cbd2a2",
+    "label": "Create index \"flat_soldByEmployeeId_idx_a6cbd2a2\" on \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "flat_soldByEmployeeId_idx_a6cbd2a2",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"flat_soldByEmployeeId_idx_a6cbd2a2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat_soldByEmployeeId_idx_a6cbd2a2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"flat_soldByEmployeeId_idx_a6cbd2a2\"",
+        "sql": "CREATE INDEX \"flat_soldByEmployeeId_idx_a6cbd2a2\" ON \"public\".\"flat\" (\"soldByEmployeeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"flat_soldByEmployeeId_idx_a6cbd2a2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat_soldByEmployeeId_idx_a6cbd2a2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.flat.flat_soldToClientId_idx_6da72b19",
+    "label": "Create index \"flat_soldToClientId_idx_6da72b19\" on \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "flat_soldToClientId_idx_6da72b19",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"flat_soldToClientId_idx_6da72b19\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat_soldToClientId_idx_6da72b19\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"flat_soldToClientId_idx_6da72b19\"",
+        "sql": "CREATE INDEX \"flat_soldToClientId_idx_6da72b19\" ON \"public\".\"flat\" (\"soldToClientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"flat_soldToClientId_idx_6da72b19\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"flat_soldToClientId_idx_6da72b19\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.flat.flat_soldByEmployeeId_fkey",
+    "label": "Add foreign key \"flat_soldByEmployeeId_fkey\" on \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "flat_soldByEmployeeId_fkey",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"flat_soldByEmployeeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_soldByEmployeeId_fkey",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"flat_soldByEmployeeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"flat\"\nADD CONSTRAINT \"flat_soldByEmployeeId_fkey\"\nFOREIGN KEY (\"soldByEmployeeId\")\nREFERENCES \"public\".\"employee\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"flat_soldByEmployeeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_soldByEmployeeId_fkey",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.flat.flat_soldToClientId_fkey",
+    "label": "Add foreign key \"flat_soldToClientId_fkey\" on \"flat\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "flat_soldToClientId_fkey",
+        "table": "flat"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"flat_soldToClientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_soldToClientId_fkey",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"flat_soldToClientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"flat\"\nADD CONSTRAINT \"flat_soldToClientId_fkey\"\nFOREIGN KEY (\"soldToClientId\")\nREFERENCES \"public\".\"client\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"flat_soldToClientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "flat_soldToClientId_fkey",
+          "public",
+          "\"public\".\"flat\""
+        ]
+      }
+    ]
+  }
+]

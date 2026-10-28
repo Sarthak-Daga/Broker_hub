@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'9c186b7928bb208937363457ed4c6d2a709d581ec80c9d360fa057941953108c'>;
+  StorageHashBase<'b28d702d1ec86f052b9078c9adb92445970664566b573a21d59f97e57a5cde60'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -276,7 +276,9 @@ export type FieldOutputTypes = {
       readonly floorId: CodecTypes['pg/int4@1']['output'];
       readonly type: CodecTypes['pg/text@1']['output'];
       readonly flatNumber: CodecTypes['pg/text@1']['output'];
-      readonly status: 'AVAILABLE' | 'SOLD';
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
+      readonly soldToClientId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['output'] | null;
     };
     readonly Floor: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -309,7 +311,7 @@ export type FieldOutputTypes = {
       readonly length: CodecTypes['pg/int4@1']['output'];
       readonly width: CodecTypes['pg/int4@1']['output'];
       readonly demand: CodecTypes['pg/int4@1']['output'];
-      readonly status: 'UNSOLD' | 'SOLD';
+      readonly status: 'UNSOLD' | 'UNAVAILABLE' | 'SOLD';
       readonly remarks: CodecTypes['pg/text@1']['output'] | null;
     };
     readonly Wing: {
@@ -358,7 +360,9 @@ export type FieldInputTypes = {
       readonly floorId: CodecTypes['pg/int4@1']['input'];
       readonly type: CodecTypes['pg/text@1']['input'];
       readonly flatNumber: CodecTypes['pg/text@1']['input'];
-      readonly status: 'AVAILABLE' | 'SOLD';
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
+      readonly soldToClientId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['input'] | null;
     };
     readonly Floor: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -391,7 +395,7 @@ export type FieldInputTypes = {
       readonly length: CodecTypes['pg/int4@1']['input'];
       readonly width: CodecTypes['pg/int4@1']['input'];
       readonly demand: CodecTypes['pg/int4@1']['input'];
-      readonly status: 'UNSOLD' | 'SOLD';
+      readonly status: 'UNSOLD' | 'UNAVAILABLE' | 'SOLD';
       readonly remarks: CodecTypes['pg/text@1']['input'] | null;
     };
     readonly Wing: {
@@ -439,7 +443,9 @@ export type StorageColumnTypes = {
       readonly flatNumber: CodecTypes['pg/text@1']['output'];
       readonly floorId: CodecTypes['pg/int4@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
-      readonly status: 'AVAILABLE' | 'SOLD';
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly soldToClientId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
       readonly type: CodecTypes['pg/text@1']['output'];
     };
     readonly floor: {
@@ -473,7 +479,7 @@ export type StorageColumnTypes = {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly length: CodecTypes['pg/int4@1']['output'];
       readonly remarks: CodecTypes['pg/text@1']['output'] | null;
-      readonly status: 'UNSOLD' | 'SOLD';
+      readonly status: 'UNSOLD' | 'UNAVAILABLE' | 'SOLD';
       readonly width: CodecTypes['pg/int4@1']['output'];
     };
     readonly wing: {
@@ -521,7 +527,9 @@ export type StorageColumnInputTypes = {
       readonly flatNumber: CodecTypes['pg/text@1']['input'];
       readonly floorId: CodecTypes['pg/int4@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
-      readonly status: 'AVAILABLE' | 'SOLD';
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly soldToClientId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
       readonly type: CodecTypes['pg/text@1']['input'];
     };
     readonly floor: {
@@ -555,7 +563,7 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly length: CodecTypes['pg/int4@1']['input'];
       readonly remarks: CodecTypes['pg/text@1']['input'] | null;
-      readonly status: 'UNSOLD' | 'SOLD';
+      readonly status: 'UNSOLD' | 'UNAVAILABLE' | 'SOLD';
       readonly width: CodecTypes['pg/int4@1']['input'];
     };
     readonly wing: {
@@ -846,6 +854,16 @@ type ContractBase = Omit<
                     readonly value: DefaultLiteralValue<'pg/text@1', 'AVAILABLE'>;
                   };
                 };
+                readonly soldToClientId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly soldByEmployeeId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
@@ -854,6 +872,18 @@ type ContractBase = Omit<
                   readonly name: 'flat_floorId_idx_f24b0a84';
                   readonly prefix: 'flat_floorId_idx';
                   readonly columns: readonly ['floorId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'flat_soldToClientId_idx_6da72b19';
+                  readonly prefix: 'flat_soldToClientId_idx';
+                  readonly columns: readonly ['soldToClientId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'flat_soldByEmployeeId_idx_a6cbd2a2';
+                  readonly prefix: 'flat_soldByEmployeeId_idx';
+                  readonly columns: readonly ['soldByEmployeeId'];
                   readonly unique: false;
                 },
               ];
@@ -867,6 +897,30 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'floor';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'flat';
+                    readonly columns: readonly ['soldToClientId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'client';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'flat';
+                    readonly columns: readonly ['soldByEmployeeId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'employee';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -1282,7 +1336,7 @@ type ContractBase = Omit<
             };
             readonly FlatStatus: {
               readonly kind: 'valueSet';
-              readonly values: readonly ['AVAILABLE', 'SOLD'];
+              readonly values: readonly ['AVAILABLE', 'UNAVAILABLE', 'SOLD'];
             };
             readonly FollowUpPurpose: {
               readonly kind: 'valueSet';
@@ -1308,7 +1362,7 @@ type ContractBase = Omit<
             };
             readonly SellerStatus: {
               readonly kind: 'valueSet';
-              readonly values: readonly ['UNSOLD', 'SOLD'];
+              readonly values: readonly ['UNSOLD', 'UNAVAILABLE', 'SOLD'];
             };
           };
         };
@@ -1498,6 +1552,14 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['clientId'];
                 };
               };
+              readonly flatsSold: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Flat' };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['soldToClientId'];
+                };
+              };
               readonly followUp: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -1614,6 +1676,14 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly flatsSold: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Flat' };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['soldByEmployeeId'];
+                };
+              };
               readonly followUp: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -1669,6 +1739,14 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly soldToClientId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly soldByEmployeeId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
             };
             readonly relations: {
               readonly floor: {
@@ -1682,6 +1760,28 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly soldByEmployee: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Employee';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['soldByEmployeeId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly soldToClient: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Client';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['soldToClientId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
             };
             readonly storage: {
               readonly table: 'flat';
@@ -1692,6 +1792,8 @@ type ContractBase = Omit<
                 readonly type: { readonly column: 'type' };
                 readonly flatNumber: { readonly column: 'flatNumber' };
                 readonly status: { readonly column: 'status' };
+                readonly soldToClientId: { readonly column: 'soldToClientId' };
+                readonly soldByEmployeeId: { readonly column: 'soldByEmployeeId' };
               };
             };
           };
@@ -2026,6 +2128,7 @@ type ContractBase = Omit<
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
               { readonly name: 'UNSOLD'; readonly value: 'UNSOLD' },
+              { readonly name: 'UNAVAILABLE'; readonly value: 'UNAVAILABLE' },
               { readonly name: 'SOLD'; readonly value: 'SOLD' },
             ];
           };
@@ -2060,6 +2163,7 @@ type ContractBase = Omit<
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
               { readonly name: 'AVAILABLE'; readonly value: 'AVAILABLE' },
+              { readonly name: 'UNAVAILABLE'; readonly value: 'UNAVAILABLE' },
               { readonly name: 'SOLD'; readonly value: 'SOLD' },
             ];
           };

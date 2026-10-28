@@ -204,3 +204,72 @@ export async function generatePropertyStructure(
     totalFlats,
   };
 }
+
+
+export async function deleteColony(formData: FormData) {
+  const colonyId = Number(formData.get("colonyId"));
+
+  if (!Number.isInteger(colonyId) || colonyId < 1) {
+    throw new Error("Please select a valid colony.");
+  }
+
+  const colonies = await db.orm.public.Colony.all();
+  const colony = colonies.find((item) => Number(item.id) === colonyId);
+
+  if (!colony) {
+    throw new Error("Colony not found.");
+  }
+
+  // Preserve marketing records linked to this colony.
+  const marketingRecords = await db.orm.public.Marketing.all();
+
+  if (
+    marketingRecords.some(
+      (record) => Number(record.colonyId) === colonyId,
+    )
+  ) {
+    throw new Error(
+      "This colony has linked marketing records. Reassign those records before deleting the colony.",
+    );
+  }
+
+  const wings = (await db.orm.public.Wing.all()).filter(
+    (wing) => Number(wing.colonyId) === colonyId,
+  );
+
+  const floors = await db.orm.public.Floor.all();
+  const flats = await db.orm.public.Flat.all();
+
+  // Delete child records before their parents.
+  for (const wing of wings) {
+    const wingFloors = floors.filter(
+      (floor) => Number(floor.wingId) === Number(wing.id),
+    );
+
+    for (const floor of wingFloors) {
+      const floorFlats = flats.filter(
+        (flat) => Number(flat.floorId) === Number(floor.id),
+      );
+
+      for (const flat of floorFlats) {
+        await db.orm.public.Flat
+          .where({ id: Number(flat.id) })
+          .delete();
+      }
+
+      await db.orm.public.Floor
+        .where({ id: Number(floor.id) })
+        .delete();
+    }
+
+    await db.orm.public.Wing
+      .where({ id: Number(wing.id) })
+      .delete();
+  }
+
+  await db.orm.public.Colony
+    .where({ id: colonyId })
+    .delete();
+
+  revalidatePath("/properties");
+}

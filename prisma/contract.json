@@ -78,6 +78,10 @@
                 "value": "AVAILABLE"
               },
               {
+                "name": "UNAVAILABLE",
+                "value": "UNAVAILABLE"
+              },
+              {
                 "name": "SOLD",
                 "value": "SOLD"
               }
@@ -177,6 +181,10 @@
               {
                 "name": "UNSOLD",
                 "value": "UNSOLD"
+              },
+              {
+                "name": "UNAVAILABLE",
+                "value": "UNAVAILABLE"
               },
               {
                 "name": "SOLD",
@@ -445,6 +453,21 @@
                   "namespace": "public"
                 }
               },
+              "flatsSold": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "soldToClientId"
+                  ]
+                },
+                "to": {
+                  "model": "Flat",
+                  "namespace": "public"
+                }
+              },
               "followUp": {
                 "cardinality": "1:N",
                 "on": {
@@ -625,6 +648,21 @@
               }
             },
             "relations": {
+              "flatsSold": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "soldByEmployeeId"
+                  ]
+                },
+                "to": {
+                  "model": "Flat",
+                  "namespace": "public"
+                }
+              },
               "followUp": {
                 "cardinality": "1:N",
                 "on": {
@@ -695,6 +733,20 @@
                   "kind": "scalar"
                 }
               },
+              "soldByEmployeeId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "soldToClientId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "status": {
                 "nullable": false,
                 "type": {
@@ -731,6 +783,36 @@
                   "model": "Floor",
                   "namespace": "public"
                 }
+              },
+              "soldByEmployee": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "soldByEmployeeId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Employee",
+                  "namespace": "public"
+                }
+              },
+              "soldToClient": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "soldToClientId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Client",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -743,6 +825,12 @@
                 },
                 "id": {
                   "column": "id"
+                },
+                "soldByEmployeeId": {
+                  "column": "soldByEmployeeId"
+                },
+                "soldToClientId": {
+                  "column": "soldToClientId"
                 },
                 "status": {
                   "column": "status"
@@ -1600,8 +1688,8 @@
             "flat": {
               "checks": [
                 {
-                  "expression": "\"status\" IN ('AVAILABLE', 'SOLD')",
-                  "name": "flat_status_check_2ae4bb86",
+                  "expression": "\"status\" IN ('AVAILABLE', 'UNAVAILABLE', 'SOLD')",
+                  "name": "flat_status_check_b0a54f12",
                   "prefix": "flat_status_check"
                 }
               ],
@@ -1624,6 +1712,16 @@
                   },
                   "nativeType": "int4",
                   "nullable": false
+                },
+                "soldByEmployeeId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "soldToClientId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
                 },
                 "status": {
                   "codecId": "pg/text@1",
@@ -1662,6 +1760,38 @@
                     "namespaceId": "public",
                     "tableName": "floor"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "soldToClientId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "flat"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "soldByEmployeeId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "flat"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "employee"
+                  }
                 }
               ],
               "indexes": [
@@ -1671,6 +1801,22 @@
                   ],
                   "name": "flat_floorId_idx_f24b0a84",
                   "prefix": "flat_floorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "soldByEmployeeId"
+                  ],
+                  "name": "flat_soldByEmployeeId_idx_a6cbd2a2",
+                  "prefix": "flat_soldByEmployeeId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "soldToClientId"
+                  ],
+                  "name": "flat_soldToClientId_idx_6da72b19",
+                  "prefix": "flat_soldToClientId_idx",
                   "unique": false
                 }
               ],
@@ -2036,8 +2182,8 @@
             "seller": {
               "checks": [
                 {
-                  "expression": "\"status\" IN ('UNSOLD', 'SOLD')",
-                  "name": "seller_status_check_1b62e46e",
+                  "expression": "\"status\" IN ('UNSOLD', 'UNAVAILABLE', 'SOLD')",
+                  "name": "seller_status_check_fb15d386",
                   "prefix": "seller_status_check"
                 }
               ],
@@ -2232,6 +2378,7 @@
               "kind": "valueSet",
               "values": [
                 "AVAILABLE",
+                "UNAVAILABLE",
                 "SOLD"
               ]
             },
@@ -2276,6 +2423,7 @@
               "kind": "valueSet",
               "values": [
                 "UNSOLD",
+                "UNAVAILABLE",
                 "SOLD"
               ]
             }
@@ -2285,7 +2433,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "9c186b7928bb208937363457ed4c6d2a709d581ec80c9d360fa057941953108c"
+    "storageHash": "b28d702d1ec86f052b9078c9adb92445970664566b573a21d59f97e57a5cde60"
   },
   "capabilities": {
     "postgres": {

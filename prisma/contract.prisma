@@ -10,6 +10,7 @@ marketing Marketing[]
 seller Seller[]
 buyer Buyer[]
 followUp FollowUp[]
+flatsSold Flat[] @relation("FlatSoldTo")
 }
 
 model Area {
@@ -22,6 +23,7 @@ model Area {
 
 enum SellerStatus{
  UNSOLD
+ UNAVAILABLE
  SOLD
 }
 
@@ -74,6 +76,7 @@ name String
 phoneNumber String
 marketing Marketing[]
 followUp FollowUp[]
+flatsSold Flat[] @relation("FlatSoldBy")
 }
 
 enum MarketingStatus{
@@ -123,6 +126,7 @@ flat Flat[]
 
 enum FlatStatus{
 AVAILABLE
+UNAVAILABLE
 SOLD
 }
 
@@ -133,6 +137,10 @@ floor Floor @relation(fields:[floorId] , references:[id])
 type String
 flatNumber String
 status FlatStatus @default(AVAILABLE)
+soldToClientId Int?
+soldToClient Client? @relation("FlatSoldTo", fields: [soldToClientId], references: [id])
+soldByEmployeeId Int?
+soldByEmployee Employee? @relation("FlatSoldBy", fields: [soldByEmployeeId], references: [id])
 }
 
 enum FollowUpStatus{

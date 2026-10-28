@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import FlatForm from "./FlatForm";
+import { useRouter } from "next/navigation";
+import { deleteColony } from "./action";
 import PropertyStructureGenerator from "./PropertyStructureGenerator";
 
 type Area = {
@@ -28,11 +30,36 @@ export default function PropertyTypeModal({
   const [propertyType, setPropertyType] = useState<"flat" | "land" | null>(
     null,
   );
+  const [manageColonies, setManageColonies] = useState(false);
   const [generatorOpen, setGeneratorOpen] = useState(false);
   const [selectedColonyId, setSelectedColonyId] = useState<number | null>(null);
   const selectedColony = colonies.find(
     (colony) => colony.id === selectedColonyId,
   );
+  const router = useRouter();
+  
+  async function handleDeleteColony(colony: Colony) {
+    const confirmed = window.confirm(
+      `Delete "${colony.name}" and all its wings, floors, and flats? This cannot be undone.`,
+    );
+  
+    if (!confirmed) return;
+  
+    const formData = new FormData();
+    formData.set("colonyId", String(colony.id));
+  
+    try {
+      await deleteColony(formData);
+      router.refresh();
+      alert("Colony deleted successfully.");
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Could not delete the colony.",
+      );
+    }
+  }
 
   function closeModal() {
     setOpen(false);
@@ -85,15 +112,61 @@ export default function PropertyTypeModal({
                     : "What type of property are you adding?"}
               </p>
             </div>
-
-            <button
-              type="button"
-              onClick={closeModal}
-              className="text-xl text-slate-500 transition hover:text-white"
-            >
-              ×
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setManageColonies((current) => !current)}
+                className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800"
+              >
+                {manageColonies ? "Hide Colonies" : "Manage Colonies"}
+              </button>
+            
+              <button
+                type="button"
+                onClick={closeModal}
+                className="text-xl text-slate-500 transition hover:text-white"
+              >
+                ×
+              </button>
+            </div>
           </div>
+          {manageColonies && (
+            <div className="mb-6 rounded-xl border border-slate-800 bg-slate-950 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-semibold">Manage Colonies</h3>
+                <button
+                  type="button"
+                  onClick={() => setManageColonies(false)}
+                  className="text-sm text-slate-400 hover:text-white"
+                >
+                  Back
+                </button>
+              </div>
+          
+              {colonies.length === 0 ? (
+                <p className="text-sm text-slate-500">No colonies to manage.</p>
+              ) : (
+                <div className="max-h-64 space-y-2 overflow-y-auto">
+                  {colonies.map((colony) => (
+                    <div
+                      key={colony.id}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-slate-800 p-3"
+                    >
+                      <span className="text-sm">{colony.name}</span>
+          
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteColony(colony)}
+                        className="rounded-lg border border-red-900/60 px-3 py-1.5 text-sm text-red-400 hover:bg-red-950/40"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Property Type Selection */}
           {!propertyType && (
@@ -116,7 +189,7 @@ export default function PropertyTypeModal({
 
                 <div className="mt-4 text-sm text-blue-400">Select →</div>
               </button>
-
+              
               {/* Land */}
               <button
                 type="button"
