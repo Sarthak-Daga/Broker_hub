@@ -1,25 +1,28 @@
-
 import { db } from "@/prisma/db";
 import Header from "../components/header";
 import Sidebar from "../components/sideBar";
 import PropertyTypeModal from "./PropertyTypeModal";
+import { updateFlatStatus } from "./action";
 
 export default async function Properties() {
-  const [areas, colonies, wings, floors, flats] = await Promise.all([
+const [areas, colonies, wings, floors, flats, employees, clients] =
+  await Promise.all([
     db.orm.public.Area.all(),
     db.orm.public.Colony.all(),
     db.orm.public.Wing.all(),
     db.orm.public.Floor.all(),
     db.orm.public.Flat.all(),
+    db.orm.public.Employee.all(),
+    db.orm.public.Client.all(),
   ]);
 
   const totalAvailable = flats.filter(
     (flat) => flat.status === "AVAILABLE",
   ).length;
-
-  const totalSold = flats.filter(
-    (flat) => flat.status === "SOLD",
+  const totalUnavailable = flats.filter(
+    (flat) => flat.status === "UNAVAILABLE",
   ).length;
+  const totalSold = flats.filter((flat) => flat.status === "SOLD").length;
 
   const totalFloors = floors.length;
   const totalWings = wings.length;
@@ -55,16 +58,16 @@ export default async function Properties() {
               <SummaryCard label="Wings" value={totalWings} />
               <SummaryCard label="Floors" value={totalFloors} />
               <SummaryCard label="Total Flats" value={flats.length} />
-              <SummaryCard
-                label="Available Flats"
-                value={totalAvailable}
-              />
+              <SummaryCard label="Available Flats" value={totalAvailable} />
             </div>
 
             {/* Availability breakdown */}
             <div className="mb-8 flex flex-wrap gap-3">
               <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-sm text-emerald-400">
                 {totalAvailable} Available
+              </span>
+              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-sm text-amber-300">
+                {totalUnavailable} Unavailable
               </span>
 
               <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-sm text-blue-400">
@@ -75,9 +78,7 @@ export default async function Properties() {
             {/* Property hierarchy */}
             <section className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50">
               <div className="border-b border-slate-800 px-6 py-5">
-                <h2 className="text-lg font-semibold">
-                  Property Inventory
-                </h2>
+                <h2 className="text-lg font-semibold">Property Inventory</h2>
 
                 <p className="mt-1 text-sm text-slate-500">
                   Browse areas, colonies, wings, floors, and flats.
@@ -152,9 +153,7 @@ export default async function Properties() {
                                 className="overflow-hidden rounded-lg border border-slate-800"
                               >
                                 <summary className="cursor-pointer list-none bg-slate-900/70 px-4 py-4 transition hover:bg-slate-900">
-                                  <span className="mr-2 text-blue-400">
-                                    ⌄
-                                  </span>
+                                  <span className="mr-2 text-blue-400">⌄</span>
 
                                   <span className="font-medium">
                                     {colony.name}
@@ -225,7 +224,9 @@ export default async function Properties() {
                                                     Number(floor.id),
                                                 )
                                                 .sort((a, b) =>
-                                                  String(a.flatNumber).localeCompare(
+                                                  String(
+                                                    a.flatNumber,
+                                                  ).localeCompare(
                                                     String(b.flatNumber),
                                                     undefined,
                                                     { numeric: true },
@@ -253,36 +254,125 @@ export default async function Properties() {
                                                     </p>
                                                   ) : (
                                                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                                                      {floorFlats.map((flat) => (
-                                                        <div
-                                                          key={flat.id}
-                                                          className="rounded-lg border border-slate-800 bg-slate-950 p-4"
-                                                        >
-                                                          <div className="flex items-start justify-between gap-2">
-                                                            <div>
-                                                              <p className="font-semibold">
-                                                                Flat{" "}
-                                                                {flat.flatNumber}
-                                                              </p>
-
-                                                              <p className="mt-1 text-sm text-slate-400">
-                                                                {flat.type}
-                                                              </p>
+                                                      {floorFlats.map(
+                                                        (flat) => (
+                                                          <div
+                                                            key={flat.id}
+                                                            className="rounded-lg border border-slate-800 bg-slate-950 p-4"
+                                                          >
+                                                            <div className="flex items-start justify-between gap-2">
+                                                              <div>
+                                                                <p className="font-semibold">
+                                                                  Flat {flat.flatNumber}
+                                                                </p>
+                                                            
+                                                                <p className="mt-1 text-sm text-slate-400">
+                                                                  {flat.type}
+                                                                </p>
+                                                              </div>
+                                                            
+                                                              <span
+                                                                className={
+                                                                  flat.status === "AVAILABLE"
+                                                                    ? "rounded-full bg-emerald-500/10 px-2 py-1 text-xs text-emerald-400"
+                                                                    : flat.status === "UNAVAILABLE"
+                                                                      ? "rounded-full bg-amber-500/10 px-2 py-1 text-xs text-amber-300"
+                                                                      : "rounded-full bg-blue-500/10 px-2 py-1 text-xs text-blue-400"
+                                                                }
+                                                              >
+                                                                {flat.status}
+                                                              </span>
                                                             </div>
-
-                                                            <span
-                                                              className={
-                                                                flat.status ===
-                                                                "AVAILABLE"
-                                                                  ? "rounded-full bg-emerald-500/10 px-2 py-1 text-xs text-emerald-400"
-                                                                  : "rounded-full bg-blue-500/10 px-2 py-1 text-xs text-blue-400"
-                                                              }
+                                                            <form
+                                                              action={updateFlatStatus}
+                                                              className="mt-4 space-y-3 border-t border-slate-800 pt-3"
                                                             >
-                                                              {flat.status}
-                                                            </span>
+                                                              <input
+                                                                type="hidden"
+                                                                name="flatId"
+                                                                value={Number(flat.id)}
+                                                              />
+                                                            
+                                                              <div>
+                                                                <label
+                                                                  htmlFor={`flat-status-${flat.id}`}
+                                                                  className="mb-1 block text-xs text-slate-400"
+                                                                >
+                                                                  Status
+                                                                </label>
+                                                            
+                                                                <select
+                                                                  id={`flat-status-${flat.id}`}
+                                                                  name="status"
+                                                                  defaultValue={flat.status}
+                                                                  className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-200"
+                                                                >
+                                                                  <option value="AVAILABLE">Available</option>
+                                                                  <option value="UNAVAILABLE">Unavailable</option>
+                                                                  <option value="SOLD">Sold</option>
+                                                                </select>
+                                                              </div>
+                                                            
+                                                              <div className="grid grid-cols-1 gap-3">
+                                                                <div>
+                                                                  <label
+                                                                    htmlFor={`flat-employee-${flat.id}`}
+                                                                    className="mb-1 block text-xs text-slate-400"
+                                                                  >
+                                                                    Sold by
+                                                                  </label>
+                                                            
+                                                                  <select
+                                                                    id={`flat-employee-${flat.id}`}
+                                                                    name="soldByEmployeeId"
+                                                                    defaultValue={flat.soldByEmployeeId?.toString() ?? ""}
+                                                                    className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-200"
+                                                                  >
+                                                                    <option value="">Select employee</option>
+                                                            
+                                                                    {employees.map((employee) => (
+                                                                      <option key={employee.id} value={String(employee.id)}>
+                                                                        {employee.name}
+                                                                      </option>
+                                                                    ))}
+                                                                  </select>
+                                                                </div>
+                                                            
+                                                                <div>
+                                                                  <label
+                                                                    htmlFor={`flat-buyer-${flat.id}`}
+                                                                    className="mb-1 block text-xs text-slate-400"
+                                                                  >
+                                                                    Sold to
+                                                                  </label>
+                                                            
+                                                                  <select
+                                                                    id={`flat-buyer-${flat.id}`}
+                                                                    name="soldToClientId"
+                                                                    defaultValue={flat.soldToClientId?.toString() ?? ""}
+                                                                    className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-200"
+                                                                  >
+                                                                    <option value="">Select buyer</option>
+                                                            
+                                                                    {clients.map((client) => (
+                                                                      <option key={client.id} value={String(client.id)}>
+                                                                        {client.name}
+                                                                      </option>
+                                                                    ))}
+                                                                  </select>
+                                                                </div>
+                                                              </div>
+                                                            
+                                                              <button
+                                                                type="submit"
+                                                                className="w-full rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-500"
+                                                              >
+                                                                Save
+                                                              </button>
+                                                            </form>
                                                           </div>
-                                                        </div>
-                                                      ))}
+                                                        ),
+                                                      )}
                                                     </div>
                                                   )}
                                                 </div>
@@ -308,8 +398,7 @@ export default async function Properties() {
                 colonies.length > 0 &&
                 !colonies.some((colony) =>
                   areas.some(
-                    (area) =>
-                      Number(area.id) === Number(colony.areaId),
+                    (area) => Number(area.id) === Number(colony.areaId),
                   ),
                 ) && (
                   <p className="px-6 pb-6 text-sm text-slate-500">
@@ -324,13 +413,7 @@ export default async function Properties() {
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: number;
-}) {
+function SummaryCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
       <p className="text-sm text-slate-500">{label}</p>

@@ -273,3 +273,96 @@ export async function deleteColony(formData: FormData) {
 
   revalidatePath("/properties");
 }
+
+export async function updateFlatStatus(formData: FormData) {
+  const flatId = Number(formData.get("flatId"));
+  const status = String(formData.get("status") ?? "");
+
+  const allowedStatuses = [
+    "AVAILABLE",
+    "UNAVAILABLE",
+    "SOLD",
+  ] as const;
+
+  if (!Number.isInteger(flatId) || flatId < 1) {
+    throw new Error("Please select a valid flat.");
+  }
+
+  if (
+    !allowedStatuses.includes(
+      status as (typeof allowedStatuses)[number],
+    )
+  ) {
+    throw new Error("Please select a valid flat status.");
+  }
+
+  const selectedStatus = status as (typeof allowedStatuses)[number];
+
+  const flats = await db.orm.public.Flat.all();
+  const flat = flats.find((item) => Number(item.id) === flatId);
+
+  if (!flat) {
+    throw new Error("Flat not found.");
+  }
+
+  let soldByEmployeeId: number | null = null;
+  let soldToClientId: number | null = null;
+
+  if (selectedStatus === "SOLD") {
+    const employeeValue = String(
+      formData.get("soldByEmployeeId") ?? "",
+    );
+
+    const clientValue = String(
+      formData.get("soldToClientId") ?? "",
+    );
+
+    soldByEmployeeId = Number(employeeValue);
+    soldToClientId = Number(clientValue);
+
+    if (
+      !employeeValue ||
+      !Number.isInteger(soldByEmployeeId) ||
+      soldByEmployeeId < 1
+    ) {
+      throw new Error("Please select the employee who sold the flat.");
+    }
+
+    if (
+      !clientValue ||
+      !Number.isInteger(soldToClientId) ||
+      soldToClientId < 1
+    ) {
+      throw new Error("Please select the buyer.");
+    }
+
+    const [employees, clients] = await Promise.all([
+      db.orm.public.Employee.all(),
+      db.orm.public.Client.all(),
+    ]);
+
+    if (
+      !employees.some(
+        (employee) => Number(employee.id) === soldByEmployeeId,
+      )
+    ) {
+      throw new Error("Selected employee was not found.");
+    }
+
+    if (
+      !clients.some(
+        (client) => Number(client.id) === soldToClientId,
+      )
+    ) {
+      throw new Error("Selected buyer was not found.");
+    }
+  }
+
+  await db.orm.public.Flat.where({ id: flatId }).update({
+    status: selectedStatus,
+    soldByEmployeeId,
+    soldToClientId,
+  });
+
+  revalidatePath("/properties");
+}
