@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, forwardRef, useImperativeHandle } from "react";
 import SearchableSelect from "../components/searchableSelect";
 import { createArea, createColony } from "./action";
 import { createPlot, updatePlotStatus } from "./plotAction";
@@ -23,11 +23,14 @@ type Seller = {
   phoneNumber: string;
 };
 
-export default function PlotForm({
-  areas,
-  colonies,
-  onColonyChange,
-}: any) {
+export type PlotFormHandle = {
+  savePlot: () => Promise<void>;
+};
+
+export default forwardRef<PlotFormHandle, any>(function PlotForm(
+  { areas, colonies, onColonyChange }: any,
+  ref,
+) {
   const [areaId, setAreaId] = useState<number | null>(null);
   const [colonyId, setColonyId] = useState<number | null>(null);
 
@@ -136,7 +139,12 @@ export default function PlotForm({
     );
   }
 
-  async function handleSavePlot() {
+  async function savePlot() {
+    if (!areaId) {
+      alert("Please select an area first.");
+      return;
+    }
+
     if (!colonyId) {
       alert("Please select a colony first.");
       return;
@@ -144,6 +152,16 @@ export default function PlotForm({
 
     if (!plotData.sellerId) {
       alert("Please select a seller for this plot.");
+      return;
+    }
+
+    if (!plotData.length || Number(plotData.length) <= 0) {
+      alert("Please enter a valid length.");
+      return;
+    }
+
+    if (!plotData.width || Number(plotData.width) <= 0) {
+      alert("Please enter a valid width.");
       return;
     }
 
@@ -178,6 +196,8 @@ export default function PlotForm({
       alert(error instanceof Error ? error.message : "Failed to create plot.");
     }
   }
+
+  useImperativeHandle(ref, () => ({ savePlot }), [savePlot]);
 
   return (
     <div className="space-y-5">
@@ -417,7 +437,7 @@ export default function PlotForm({
       <div className="pt-4">
         <button
           type="button"
-          onClick={handleSavePlot}
+          onClick={savePlot}
           disabled={!plotData.sellerId}
           className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
@@ -426,7 +446,7 @@ export default function PlotForm({
       </div>
     </div>
   );
-}
+});
 
 function CreationBox({
   label,

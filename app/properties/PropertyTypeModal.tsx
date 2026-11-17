@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import FlatForm from "./FlatForm";
+import PlotForm, { PlotFormHandle } from "./PlotForm";
 import { deleteColony } from "./action";
+import { deletePlot } from "./plotAction";
 import PropertyStructureGenerator from "./PropertyStructureGenerator";
+import { useRouter } from "next/navigation";
 
 type Area = {
   id: number;
@@ -36,6 +39,7 @@ export default function PropertyTypeModal({
     (colony) => colony.id === selectedColonyId,
   );
   const router = useRouter();
+  const plotFormRef = useRef<PlotFormHandle>(null);
 
   async function handleDeletePlot(plot: any) {
     const confirmed = window.confirm(
@@ -56,6 +60,30 @@ export default function PropertyTypeModal({
         error instanceof Error
           ? error.message
           : "Could not delete the plot.",
+      );
+    }
+  }
+
+  async function handleDeleteColony(colony: Colony) {
+    const confirmed = window.confirm(
+      `Delete "${colony.name}"?` +
+      ` This will remove the colony and all of its structure. This cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    const formData = new FormData();
+    formData.set("colonyId", String(colony.id));
+
+    try {
+      await deleteColony(formData);
+      router.refresh();
+      alert("Colony deleted successfully.");
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Could not delete the colony.",
       );
     }
   }
@@ -250,6 +278,7 @@ export default function PropertyTypeModal({
           {propertyType === "land" && (
             <>
               <PlotForm
+                ref={plotFormRef}
                 areas={areas}
                 colonies={colonies}
                 onColonyChange={setSelectedColonyId}
@@ -266,14 +295,14 @@ export default function PropertyTypeModal({
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (!selectedColonyId) {
-                      alert("Please select a colony first.");
-                      return;
+                  onClick={async () => {
+                    try {
+                      await plotFormRef.current?.savePlot();
+                      router.refresh();
+                      setPropertyType(null);
+                    } catch (error) {
+                      // savePlot already reports errors via alert.
                     }
-                    // For now, just close the modal. The actual plot creation
-                    // should be handled by the PlotForm's own save logic.
-                    setPropertyType(null);
                   }}
                   className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500"
                 >
