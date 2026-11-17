@@ -1,0 +1,365 @@
+[
+  {
+    "id": "table.plot",
+    "label": "Create table \"plot\"",
+    "summary": "Creates table \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"plot\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"plot\"",
+        "sql": "CREATE TABLE \"public\".\"plot\" (\n  \"areaId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"length\" int4 NOT NULL,\n  \"location\" text,\n  \"remarks\" text,\n  \"salePricePerSqFt\" int4,\n  \"sellerId\" int4 NOT NULL,\n  \"soldByEmployeeId\" int4,\n  \"soldToClientId\" int4,\n  \"status\" text DEFAULT 'AVAILABLE' NOT NULL,\n  \"title\" text,\n  \"totalArea\" int4 NOT NULL,\n  \"totalPrice\" int4,\n  \"width\" int4 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"plot_status_check_b0a54f12\" CHECK (\"status\" IN ('AVAILABLE', 'UNAVAILABLE', 'SOLD'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"plot\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.plot.plot_areaId_idx_abf7188c",
+    "label": "Create index \"plot_areaId_idx_abf7188c\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "plot_areaId_idx_abf7188c",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"plot_areaId_idx_abf7188c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_areaId_idx_abf7188c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"plot_areaId_idx_abf7188c\"",
+        "sql": "CREATE INDEX \"plot_areaId_idx_abf7188c\" ON \"public\".\"plot\" (\"areaId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"plot_areaId_idx_abf7188c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_areaId_idx_abf7188c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.plot.plot_sellerId_idx_d71255f2",
+    "label": "Create index \"plot_sellerId_idx_d71255f2\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "plot_sellerId_idx_d71255f2",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"plot_sellerId_idx_d71255f2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_sellerId_idx_d71255f2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"plot_sellerId_idx_d71255f2\"",
+        "sql": "CREATE INDEX \"plot_sellerId_idx_d71255f2\" ON \"public\".\"plot\" (\"sellerId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"plot_sellerId_idx_d71255f2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_sellerId_idx_d71255f2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.plot.plot_soldByEmployeeId_idx_a6cbd2a2",
+    "label": "Create index \"plot_soldByEmployeeId_idx_a6cbd2a2\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "plot_soldByEmployeeId_idx_a6cbd2a2",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"plot_soldByEmployeeId_idx_a6cbd2a2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_soldByEmployeeId_idx_a6cbd2a2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"plot_soldByEmployeeId_idx_a6cbd2a2\"",
+        "sql": "CREATE INDEX \"plot_soldByEmployeeId_idx_a6cbd2a2\" ON \"public\".\"plot\" (\"soldByEmployeeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"plot_soldByEmployeeId_idx_a6cbd2a2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_soldByEmployeeId_idx_a6cbd2a2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.plot.plot_soldToClientId_idx_6da72b19",
+    "label": "Create index \"plot_soldToClientId_idx_6da72b19\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "plot_soldToClientId_idx_6da72b19",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"plot_soldToClientId_idx_6da72b19\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_soldToClientId_idx_6da72b19\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"plot_soldToClientId_idx_6da72b19\"",
+        "sql": "CREATE INDEX \"plot_soldToClientId_idx_6da72b19\" ON \"public\".\"plot\" (\"soldToClientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"plot_soldToClientId_idx_6da72b19\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"plot_soldToClientId_idx_6da72b19\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.plot.plot_areaId_fkey",
+    "label": "Add foreign key \"plot_areaId_fkey\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "plot_areaId_fkey",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"plot_areaId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_areaId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"plot_areaId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"plot\"\nADD CONSTRAINT \"plot_areaId_fkey\"\nFOREIGN KEY (\"areaId\")\nREFERENCES \"public\".\"area\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"plot_areaId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_areaId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.plot.plot_sellerId_fkey",
+    "label": "Add foreign key \"plot_sellerId_fkey\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "plot_sellerId_fkey",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"plot_sellerId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_sellerId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"plot_sellerId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"plot\"\nADD CONSTRAINT \"plot_sellerId_fkey\"\nFOREIGN KEY (\"sellerId\")\nREFERENCES \"public\".\"seller\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"plot_sellerId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_sellerId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.plot.plot_soldToClientId_fkey",
+    "label": "Add foreign key \"plot_soldToClientId_fkey\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "plot_soldToClientId_fkey",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"plot_soldToClientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_soldToClientId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"plot_soldToClientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"plot\"\nADD CONSTRAINT \"plot_soldToClientId_fkey\"\nFOREIGN KEY (\"soldToClientId\")\nREFERENCES \"public\".\"client\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"plot_soldToClientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_soldToClientId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.plot.plot_soldByEmployeeId_fkey",
+    "label": "Add foreign key \"plot_soldByEmployeeId_fkey\" on \"plot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "plot_soldByEmployeeId_fkey",
+        "table": "plot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"plot_soldByEmployeeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_soldByEmployeeId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"plot_soldByEmployeeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"plot\"\nADD CONSTRAINT \"plot_soldByEmployeeId_fkey\"\nFOREIGN KEY (\"soldByEmployeeId\")\nREFERENCES \"public\".\"employee\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"plot_soldByEmployeeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "plot_soldByEmployeeId_fkey",
+          "public",
+          "\"public\".\"plot\""
+        ]
+      }
+    ]
+  }
+]

@@ -143,6 +143,33 @@ soldByEmployeeId Int?
 soldByEmployee Employee? @relation("FlatSoldBy", fields: [soldByEmployeeId], references: [id])
 }
 
+model Plot{
+id Int @id @default(autoincrement())
+title String?
+areaId Int
+area Area @relation(fields: [areaId], references: [id])
+location String?
+remarks String?
+length Int
+width Int
+totalArea Int
+salePricePerSqFt Int?
+totalPrice Int?
+sellerId Int
+seller Seller @relation(fields: [sellerId], references: [id])
+status PlotStatus @default(AVAILABLE)
+soldToClientId Int?
+soldToClient Client? @relation(fields: [soldToClientId], references: [id])
+soldByEmployeeId Int?
+soldByEmployee Employee? @relation(fields: [soldByEmployeeId], references: [id])
+}
+
+enum PlotStatus{
+AVAILABLE
+UNAVAILABLE
+SOLD
+}
+
 enum FollowUpStatus{
 PENDING
 DONE

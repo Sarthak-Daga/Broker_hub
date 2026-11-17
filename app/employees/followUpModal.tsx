@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addFollowUP } from "./action";
+import { addFollowUp } from "./action";
 
 type Employee = {
   id: number;
@@ -66,7 +66,7 @@ export default function FollowUpModal({
             {/* Form */}
             <form
               action={async (formData) => {
-                await addFollowUP(formData);
+                await addFollowUp(formData);
                 closeModal();
               }}
               className="space-y-5 p-6"

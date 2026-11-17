@@ -15,30 +15,12 @@ type Colony = {
   areaId: number;
 };
 
-type FlatFormProps = {
-  areas: Area[];
-  colonies: Colony[];
-  onColonyChange?: (colonyId: number | null) => void;
-};
-
-export default function FlatForm({ areas, colonies , onColonyChange }: FlatFormProps) {
-  // --------------------------------------------------
-  // Selected hierarchy
-  // --------------------------------------------------
-
+export default function FlatForm({ areas, colonies, onColonyChange }: any) {
   const [areaId, setAreaId] = useState<number | null>(null);
   const [colonyId, setColonyId] = useState<number | null>(null);
 
-  // --------------------------------------------------
-  // Local copies
-  // --------------------------------------------------
-
   const [localAreas, setLocalAreas] = useState<Area[]>(areas);
   const [localColonies, setLocalColonies] = useState<Colony[]>(colonies);
-
-  // --------------------------------------------------
-  // Creation UI state
-  // --------------------------------------------------
 
   const [addingArea, setAddingArea] = useState(false);
   const [addingColony, setAddingColony] = useState(false);
@@ -48,17 +30,9 @@ export default function FlatForm({ areas, colonies , onColonyChange }: FlatFormP
 
   const [creating, setCreating] = useState<"area" | "colony" | null>(null);
 
-  // --------------------------------------------------
-  // Cascading filters
-  // --------------------------------------------------
-
   const filteredColonies = localColonies.filter(
     (colony) => colony.areaId === areaId,
   );
-
-  // --------------------------------------------------
-  // Create Area
-  // --------------------------------------------------
 
   async function handleCreateArea() {
     if (!newAreaName.trim()) return;
@@ -84,10 +58,6 @@ export default function FlatForm({ areas, colonies , onColonyChange }: FlatFormP
       setCreating(null);
     }
   }
-
-  // --------------------------------------------------
-  // Create Colony
-  // --------------------------------------------------
 
   async function handleCreateColony() {
     if (!areaId || !newColonyName.trim()) return;
@@ -117,10 +87,7 @@ export default function FlatForm({ areas, colonies , onColonyChange }: FlatFormP
 
   return (
     <div className="space-y-5">
-      {/* ================================================= */}
       {/* AREA */}
-      {/* ================================================= */}
-
       <div>
         <label className="mb-2 block text-sm font-medium text-slate-300">
           Area
@@ -165,10 +132,7 @@ export default function FlatForm({ areas, colonies , onColonyChange }: FlatFormP
         </div>
       </div>
 
-      {/* ================================================= */}
       {/* COLONY */}
-      {/* ================================================= */}
-
       <div>
         <label className="mb-2 block text-sm font-medium text-slate-300">
           Colony
@@ -218,10 +182,6 @@ export default function FlatForm({ areas, colonies , onColonyChange }: FlatFormP
     </div>
   );
 }
-
-// =====================================================
-// Reusable creation box
-// =====================================================
 
 function CreationBox({
   label,

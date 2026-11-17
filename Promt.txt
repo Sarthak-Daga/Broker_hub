@@ -1,0 +1,352 @@
+# BrokerHub — Implement Plot / Land Management
+
+We are working on BrokerHub, a real estate CRM built using:
+
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- PostgreSQL
+- Docker
+- Prisma 8 RC with a contract-based schema
+
+The Flat / Apartment management functionality is already implemented.
+
+The Add Property modal already has two options:
+
+1. Flat / Apartment
+2. Plot / Land
+
+I want to implement the **Plot / Land functionality completely**.
+
+## 1. Core Concept
+
+Unlike flats, plots are independent properties.
+
+They must NOT belong to the existing hierarchy:
+
+Area → Colony → Wing → Floor → Flat
+
+A plot should be independently registered and managed.
+
+However, it should reuse existing relationships such as Area, Seller, Client/Buyer, and Employee wherever appropriate.
+
+## 2. Plot Information
+
+Each plot should contain:
+
+**Basic details**
+- Unique ID.
+- Property title/reference (optional).
+- Area.
+- Location/address.
+- Remarks/description (optional).
+
+**Dimensions**
+- Length.
+- Width.
+- Measurement unit (initially feet).
+- Total area in square feet.
+
+Calculate automatically:
+
+Total Area = Length × Width
+
+Example:
+- Length: 100 ft
+- Width: 30 ft
+- Total area: 3,000 sq. ft.
+
+Dimensions must be positive numbers.
+
+**Pricing**
+- Asking price per square foot.
+- Total asking price.
+
+Calculate automatically:
+
+Total Price = Total Area × Price Per Sq. Ft.
+
+Example:
+- Area: 3,000 sq. ft.
+- Price: ₹5,000/sq. ft.
+- Total: ₹1,50,00,000.
+
+Use appropriate database numeric types for financial values. Do not rely on floating-point precision for monetary calculations.
+
+## 3. Seller Relationship
+
+A plot should be associated with an existing Seller record wherever possible.
+
+Requirements:
+- Select an existing seller when adding a plot.
+- Display seller details on the plot.
+- View plots associated with a seller.
+- Allow an unassigned seller if the existing workflow supports it.
+
+Do not create another Seller model.
+
+Inspect the current Seller schema before deciding the relationship.
+
+## 4. Plot Status
+
+Use three statuses:
+
+- AVAILABLE
+- UNAVAILABLE
+- SOLD
+
+**AVAILABLE**
+- Plot is available for purchase.
+- It can be considered for buyer matching.
+
+**UNAVAILABLE**
+- Temporarily unavailable.
+- Should not appear as an available property.
+
+**SOLD**
+- Plot has been sold.
+- Sale details must be recorded.
+
+Use the existing project's enum conventions.
+
+## 5. Sale Tracking
+
+When a plot is marked SOLD, the user must select:
+
+- **Sold To:** The buyer/client who purchased the plot.
+- **Sold By:** The employee who handled the sale.
+
+Both should be selected from existing database records.
+
+Requirements:
+- Buyer/client is mandatory when marking SOLD.
+- Employee is mandatory when marking SOLD.
+- Validate both on the server.
+- Save the relationships along with the status update.
+- Display buyer and employee names on sold plot cards.
+
+When changing a sold plot back to AVAILABLE or UNAVAILABLE, clear the current sale associations unless an existing sale-history mechanism is available.
+
+Inspect the existing Flat sale-tracking implementation and follow its conventions.
+
+Do not blindly copy flat-specific relationships.
+
+## 6. Add Plot Form
+
+When the user selects:
+
+Add Property → Plot / Land
+
+Open a dedicated form/modal.
+
+Organize it into these sections:
+
+**Property Details**
+- Property title/reference.
+- Area selection.
+- Location/address.
+- Remarks.
+
+**Dimensions**
+- Length.
+- Width.
+- Unit.
+- Automatically calculated total area.
+
+**Pricing**
+- Price per square foot.
+- Automatically calculated total asking price.
+
+**Seller**
+- Dropdown populated from existing sellers.
+
+**Status**
+- Default: AVAILABLE.
+
+Buyer and Sold By fields should not be required during ordinary plot creation. They should appear when the user marks the plot SOLD.
+
+## 7. Plot Listing
+
+Create a dedicated plot listing page or section following existing routing conventions.
+
+Display:
+
+- Plot reference/title.
+- Area.
+- Location.
+- Dimensions.
+- Total area.
+- Asking price per sq. ft.
+- Total asking price.
+- Seller.
+- Status.
+- Buyer and employee details if sold.
+
+Provide:
+- View details.
+- Edit.
+- Change status.
+- Delete with confirmation.
+
+## 8. Search and Filters
+
+Allow users to search/filter plots using:
+
+- Area.
+- Location.
+- Status.
+- Minimum and maximum area.
+- Minimum and maximum asking price.
+- Seller.
+
+Keep filtering consistent with the existing UI.
+
+## 9. Buyer Matching — Future Compatibility
+
+We may later connect plots to buyer requirements.
+
+Example:
+
+A buyer wants:
+- Area: ABC.
+- Length: 40 ft.
+- Width: 30 ft.
+- Required area: 1,200 sq. ft.
+
+Our plot data should support matching available plots against these requirements.
+
+Do not build a complicated recommendation system now. Just ensure the data model supports this future functionality.
+
+## 10. Database and Architecture
+
+Before changing anything:
+
+1. Inspect `prisma/contract.prisma`.
+2. Inspect existing Area, Seller, Buyer, Client, Employee, and Flat models.
+3. Inspect the existing Flat sale-tracking implementation.
+4. Inspect the Add Property flow.
+5. Understand the existing Prisma 8 RC migration workflow.
+
+Propose a dedicated Plot model with appropriate relationships.
+
+Potential fields:
+
+- id
+- title
+- areaId
+- location
+- length
+- width
+- measurementUnit
+- totalArea
+- pricePerSqFt
+- totalPrice
+- sellerId
+- status
+- soldToClientId (or the correct existing buyer relationship)
+- soldByEmployeeId
+- remarks
+
+These are proposed fields. Adapt them to the actual project schema.
+
+Important:
+- Do not force plots into the Flat hierarchy.
+- Reuse existing models.
+- Add appropriate foreign keys and indexes.
+- Prevent invalid sale states.
+- Validate important data on the server.
+
+## 11. Strict Prisma 8 RC Rules
+
+This project uses Prisma 8 RC and a contract-based schema.
+
+Our database access pattern uses:
+
+`import { db } from "@/prisma/db";`
+
+Examples:
+
+`db.orm.public.Model.all()`
+
+`db.orm.public.Model.create(...)`
+
+`db.orm.public.Model.where({ id }).update(...)`
+
+`db.orm.public.Model.where({ id }).delete()`
+
+Do not switch to traditional Prisma syntax such as:
+
+`prisma.model.findMany()`
+
+Do not blindly suggest classic `npx prisma migrate dev`.
+
+Follow the existing contract and custom migration workflow.
+
+## 12. Implementation Order
+
+Implement in this order:
+
+**Phase 1 — Schema design**
+- Inspect existing models and relationships.
+- Propose the Plot model.
+- Explain all relationships.
+- Wait for my approval.
+
+**Phase 2 — Database**
+- Update contract.
+- Review schema.
+- Generate and inspect migration.
+- Apply migration.
+- Verify database state.
+
+**Phase 3 — Backend**
+- Create plot.
+- Update plot.
+- Update status.
+- Record sale.
+- Delete plot.
+- Add validation.
+
+**Phase 4 — Frontend**
+- Connect Add Property → Plot/Land.
+- Build Add Plot form.
+- Build plot listing.
+- Implement edit/delete.
+- Implement status management.
+- Implement sale tracking.
+- Add search and filters.
+
+**Phase 5 — Testing**
+Test all CRUD operations, calculations, status transitions, sale relationships, persistence, and invalid inputs.
+
+## 13. Strict Working Instructions
+
+I do NOT want complete replacement files or downloadable code files.
+
+Tell me exactly:
+- Which file to open.
+- Where to make changes.
+- What to add, modify, or remove.
+- Why the change is necessary.
+
+Provide focused code snippets when needed.
+
+Wait for me to implement and share the updated code before moving to the next step.
+
+Do not modify existing Flat/Apartment functionality unless absolutely necessary.
+
+Do not modify the Marketing module.
+
+Do not implement the Seller/Buyer module as a separate feature.
+
+Do not introduce unrelated functionality.
+
+### START HERE
+
+First inspect the existing schema and Flat sale-tracking implementation.
+
+Explain how a Plot should connect to Area, Seller, Client/Buyer, and Employee.
+
+Then propose the exact Plot database model and relationships.
+
+**Do not write implementation code until I approve the proposed schema.**

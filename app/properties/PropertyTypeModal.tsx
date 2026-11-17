@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import FlatForm from "./FlatForm";
-import { useRouter } from "next/navigation";
 import { deleteColony } from "./action";
 import PropertyStructureGenerator from "./PropertyStructureGenerator";
 
@@ -37,26 +36,26 @@ export default function PropertyTypeModal({
     (colony) => colony.id === selectedColonyId,
   );
   const router = useRouter();
-  
-  async function handleDeleteColony(colony: Colony) {
+
+  async function handleDeletePlot(plot: any) {
     const confirmed = window.confirm(
-      `Delete "${colony.name}" and all its wings, floors, and flats? This cannot be undone.`,
+      `Delete "${plot.title || "Untitled"}" plot? This cannot be undone.`,
     );
-  
+
     if (!confirmed) return;
-  
+
     const formData = new FormData();
-    formData.set("colonyId", String(colony.id));
-  
+    formData.set("plotId", String(plot.id));
+
     try {
-      await deleteColony(formData);
+      await deletePlot(formData);
       router.refresh();
-      alert("Colony deleted successfully.");
+      alert("Plot deleted successfully.");
     } catch (error) {
       alert(
         error instanceof Error
           ? error.message
-          : "Could not delete the colony.",
+          : "Could not delete the plot.",
       );
     }
   }
@@ -247,23 +246,41 @@ export default function PropertyTypeModal({
             </>
           )}
 
-          {/* Land - temporary */}
+          {/* Land / Plot form */}
           {propertyType === "land" && (
-            <div className="rounded-xl border border-dashed border-slate-700 bg-slate-950/50 p-8 text-center">
-              <div className="text-4xl">🏞️</div>
+            <>
+              <PlotForm
+                areas={areas}
+                colonies={colonies}
+                onColonyChange={setSelectedColonyId}
+              />
 
-              <p className="mt-3 text-sm text-slate-400">
-                Plot / Land form coming next.
-              </p>
+              <div className="mt-6 flex justify-end gap-3 border-t border-slate-800 pt-5">
+                <button
+                  type="button"
+                  onClick={() => setPropertyType(null)}
+                  className="rounded-lg border border-slate-700 px-4 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800"
+                >
+                  Back
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setPropertyType(null)}
-                className="mt-4 text-sm text-blue-400 hover:text-blue-300"
-              >
-                ← Back
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!selectedColonyId) {
+                      alert("Please select a colony first.");
+                      return;
+                    }
+                    // For now, just close the modal. The actual plot creation
+                    // should be handled by the PlotForm's own save logic.
+                    setPropertyType(null);
+                  }}
+                  className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500"
+                >
+                  Save Plot
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>

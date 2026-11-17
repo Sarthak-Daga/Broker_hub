@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'b28d702d1ec86f052b9078c9adb92445970664566b573a21d59f97e57a5cde60'>;
+  StorageHashBase<'74f7f0a227aa53abdfc72d8fdab639af2ce1273c3366e5f9b7e4cbe6a32fd92d'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -304,6 +304,22 @@ export type FieldOutputTypes = {
       readonly status: 'NONE' | 'CALLED_NOT_VISITED' | 'VISITED' | 'NOT_INTERESTED';
       readonly priority: 'ONE_STAR' | 'TWO_STAR' | 'THREE_STAR' | 'FOUR_STAR' | 'FIVE_STAR';
     };
+    readonly Plot: {
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly title: CodecTypes['pg/text@1']['output'] | null;
+      readonly areaId: CodecTypes['pg/int4@1']['output'];
+      readonly location: CodecTypes['pg/text@1']['output'] | null;
+      readonly remarks: CodecTypes['pg/text@1']['output'] | null;
+      readonly length: CodecTypes['pg/int4@1']['output'];
+      readonly width: CodecTypes['pg/int4@1']['output'];
+      readonly totalArea: CodecTypes['pg/int4@1']['output'];
+      readonly salePricePerSqFt: CodecTypes['pg/int4@1']['output'] | null;
+      readonly totalPrice: CodecTypes['pg/int4@1']['output'] | null;
+      readonly sellerId: CodecTypes['pg/int4@1']['output'];
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
+      readonly soldToClientId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['output'] | null;
+    };
     readonly Seller: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly clientId: CodecTypes['pg/int4@1']['output'];
@@ -387,6 +403,22 @@ export type FieldInputTypes = {
       readonly remarks: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'NONE' | 'CALLED_NOT_VISITED' | 'VISITED' | 'NOT_INTERESTED';
       readonly priority: 'ONE_STAR' | 'TWO_STAR' | 'THREE_STAR' | 'FOUR_STAR' | 'FIVE_STAR';
+    };
+    readonly Plot: {
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly title: CodecTypes['pg/text@1']['input'] | null;
+      readonly areaId: CodecTypes['pg/int4@1']['input'];
+      readonly location: CodecTypes['pg/text@1']['input'] | null;
+      readonly remarks: CodecTypes['pg/text@1']['input'] | null;
+      readonly length: CodecTypes['pg/int4@1']['input'];
+      readonly width: CodecTypes['pg/int4@1']['input'];
+      readonly totalArea: CodecTypes['pg/int4@1']['input'];
+      readonly salePricePerSqFt: CodecTypes['pg/int4@1']['input'] | null;
+      readonly totalPrice: CodecTypes['pg/int4@1']['input'] | null;
+      readonly sellerId: CodecTypes['pg/int4@1']['input'];
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
+      readonly soldToClientId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['input'] | null;
     };
     readonly Seller: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -472,6 +504,22 @@ export type StorageColumnTypes = {
       readonly remarks: CodecTypes['pg/text@1']['output'] | null;
       readonly status: 'NONE' | 'CALLED_NOT_VISITED' | 'VISITED' | 'NOT_INTERESTED';
     };
+    readonly plot: {
+      readonly areaId: CodecTypes['pg/int4@1']['output'];
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly length: CodecTypes['pg/int4@1']['output'];
+      readonly location: CodecTypes['pg/text@1']['output'] | null;
+      readonly remarks: CodecTypes['pg/text@1']['output'] | null;
+      readonly salePricePerSqFt: CodecTypes['pg/int4@1']['output'] | null;
+      readonly sellerId: CodecTypes['pg/int4@1']['output'];
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly soldToClientId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
+      readonly title: CodecTypes['pg/text@1']['output'] | null;
+      readonly totalArea: CodecTypes['pg/int4@1']['output'];
+      readonly totalPrice: CodecTypes['pg/int4@1']['output'] | null;
+      readonly width: CodecTypes['pg/int4@1']['output'];
+    };
     readonly seller: {
       readonly areaId: CodecTypes['pg/int4@1']['output'];
       readonly clientId: CodecTypes['pg/int4@1']['output'];
@@ -555,6 +603,22 @@ export type StorageColumnInputTypes = {
       readonly priority: 'ONE_STAR' | 'TWO_STAR' | 'THREE_STAR' | 'FOUR_STAR' | 'FIVE_STAR';
       readonly remarks: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'NONE' | 'CALLED_NOT_VISITED' | 'VISITED' | 'NOT_INTERESTED';
+    };
+    readonly plot: {
+      readonly areaId: CodecTypes['pg/int4@1']['input'];
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly length: CodecTypes['pg/int4@1']['input'];
+      readonly location: CodecTypes['pg/text@1']['input'] | null;
+      readonly remarks: CodecTypes['pg/text@1']['input'] | null;
+      readonly salePricePerSqFt: CodecTypes['pg/int4@1']['input'] | null;
+      readonly sellerId: CodecTypes['pg/int4@1']['input'];
+      readonly soldByEmployeeId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly soldToClientId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly status: 'AVAILABLE' | 'UNAVAILABLE' | 'SOLD';
+      readonly title: CodecTypes['pg/text@1']['input'] | null;
+      readonly totalArea: CodecTypes['pg/int4@1']['input'];
+      readonly totalPrice: CodecTypes['pg/int4@1']['input'] | null;
+      readonly width: CodecTypes['pg/int4@1']['input'];
     };
     readonly seller: {
       readonly areaId: CodecTypes['pg/int4@1']['input'];
@@ -1182,6 +1246,166 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly plot: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'function';
+                    readonly expression: 'autoincrement()';
+                  };
+                };
+                readonly title: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly areaId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly location: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly remarks: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly length: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly width: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly totalArea: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly salePricePerSqFt: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly totalPrice: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly sellerId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'AVAILABLE'>;
+                  };
+                };
+                readonly soldToClientId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly soldByEmployeeId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'plot_areaId_idx_abf7188c';
+                  readonly prefix: 'plot_areaId_idx';
+                  readonly columns: readonly ['areaId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'plot_sellerId_idx_d71255f2';
+                  readonly prefix: 'plot_sellerId_idx';
+                  readonly columns: readonly ['sellerId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'plot_soldToClientId_idx_6da72b19';
+                  readonly prefix: 'plot_soldToClientId_idx';
+                  readonly columns: readonly ['soldToClientId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'plot_soldByEmployeeId_idx_a6cbd2a2';
+                  readonly prefix: 'plot_soldByEmployeeId_idx';
+                  readonly columns: readonly ['soldByEmployeeId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'plot';
+                    readonly columns: readonly ['areaId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'area';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'plot';
+                    readonly columns: readonly ['sellerId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'seller';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'plot';
+                    readonly columns: readonly ['soldToClientId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'client';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'plot';
+                    readonly columns: readonly ['soldByEmployeeId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'employee';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly seller: {
               columns: {
                 readonly id: {
@@ -1350,6 +1574,10 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['NONE', 'CALLED_NOT_VISITED', 'VISITED', 'NOT_INTERESTED'];
             };
+            readonly PlotStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['AVAILABLE', 'UNAVAILABLE', 'SOLD'];
+            };
             readonly Priority: {
               readonly kind: 'valueSet';
               readonly values: readonly [
@@ -1385,6 +1613,7 @@ type ContractBase = Omit<
     readonly wing: { readonly namespace: 'public' & NamespaceId; readonly model: 'Wing' };
     readonly floor: { readonly namespace: 'public' & NamespaceId; readonly model: 'Floor' };
     readonly flat: { readonly namespace: 'public' & NamespaceId; readonly model: 'Flat' };
+    readonly plot: { readonly namespace: 'public' & NamespaceId; readonly model: 'Plot' };
     readonly followUp: { readonly namespace: 'public' & NamespaceId; readonly model: 'FollowUp' };
   };
   readonly domain: {
@@ -1997,6 +2226,129 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly Plot: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly title: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly areaId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly location: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly remarks: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly length: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly width: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly totalArea: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly salePricePerSqFt: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly totalPrice: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly sellerId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly soldToClientId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly soldByEmployeeId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly area: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Area' };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['areaId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly seller: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Seller';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['sellerId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly soldByEmployee: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Employee';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['soldByEmployeeId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly soldToClient: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Client';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['soldToClientId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'plot';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly title: { readonly column: 'title' };
+                readonly areaId: { readonly column: 'areaId' };
+                readonly location: { readonly column: 'location' };
+                readonly remarks: { readonly column: 'remarks' };
+                readonly length: { readonly column: 'length' };
+                readonly width: { readonly column: 'width' };
+                readonly totalArea: { readonly column: 'totalArea' };
+                readonly salePricePerSqFt: { readonly column: 'salePricePerSqFt' };
+                readonly totalPrice: { readonly column: 'totalPrice' };
+                readonly sellerId: { readonly column: 'sellerId' };
+                readonly status: { readonly column: 'status' };
+                readonly soldToClientId: { readonly column: 'soldToClientId' };
+                readonly soldByEmployeeId: { readonly column: 'soldByEmployeeId' };
+              };
+            };
+          };
           readonly Seller: {
             readonly fields: {
               readonly id: {
@@ -2160,6 +2512,14 @@ type ContractBase = Omit<
             ];
           };
           readonly FlatStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'AVAILABLE'; readonly value: 'AVAILABLE' },
+              { readonly name: 'UNAVAILABLE'; readonly value: 'UNAVAILABLE' },
+              { readonly name: 'SOLD'; readonly value: 'SOLD' },
+            ];
+          };
+          readonly PlotStatus: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
               { readonly name: 'AVAILABLE'; readonly value: 'AVAILABLE' },

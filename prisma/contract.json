@@ -40,6 +40,10 @@
       "model": "Marketing",
       "namespace": "public"
     },
+    "plot": {
+      "model": "Plot",
+      "namespace": "public"
+    },
     "seller": {
       "model": "Seller",
       "namespace": "public"
@@ -147,6 +151,23 @@
               {
                 "name": "NOT_INTERESTED",
                 "value": "NOT_INTERESTED"
+              }
+            ]
+          },
+          "PlotStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "AVAILABLE",
+                "value": "AVAILABLE"
+              },
+              {
+                "name": "UNAVAILABLE",
+                "value": "UNAVAILABLE"
+              },
+              {
+                "name": "SOLD",
+                "value": "SOLD"
               }
             ]
           },
@@ -1188,6 +1209,224 @@
               "table": "marketing"
             }
           },
+          "Plot": {
+            "fields": {
+              "areaId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "length": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "location": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "remarks": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "salePricePerSqFt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "sellerId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "soldByEmployeeId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "soldToClientId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "PlotStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "title": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "totalArea": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "totalPrice": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "width": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "area": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "areaId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Area",
+                  "namespace": "public"
+                }
+              },
+              "seller": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "sellerId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Seller",
+                  "namespace": "public"
+                }
+              },
+              "soldByEmployee": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "soldByEmployeeId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Employee",
+                  "namespace": "public"
+                }
+              },
+              "soldToClient": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "soldToClientId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Client",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "areaId": {
+                  "column": "areaId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "length": {
+                  "column": "length"
+                },
+                "location": {
+                  "column": "location"
+                },
+                "remarks": {
+                  "column": "remarks"
+                },
+                "salePricePerSqFt": {
+                  "column": "salePricePerSqFt"
+                },
+                "sellerId": {
+                  "column": "sellerId"
+                },
+                "soldByEmployeeId": {
+                  "column": "soldByEmployeeId"
+                },
+                "soldToClientId": {
+                  "column": "soldToClientId"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "totalArea": {
+                  "column": "totalArea"
+                },
+                "totalPrice": {
+                  "column": "totalPrice"
+                },
+                "width": {
+                  "column": "width"
+                }
+              },
+              "namespaceId": "public",
+              "table": "plot"
+            }
+          },
           "Seller": {
             "fields": {
               "areaId": {
@@ -2179,6 +2418,207 @@
               },
               "uniques": []
             },
+            "plot": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('AVAILABLE', 'UNAVAILABLE', 'SOLD')",
+                  "name": "plot_status_check_b0a54f12",
+                  "prefix": "plot_status_check"
+                }
+              ],
+              "columns": {
+                "areaId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "length": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "location": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "remarks": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "salePricePerSqFt": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "sellerId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "soldByEmployeeId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "soldToClientId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "AVAILABLE"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "PlotStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "title": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "totalArea": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "totalPrice": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "width": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "areaId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "plot"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "area"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "sellerId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "plot"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "seller"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "soldToClientId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "plot"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "soldByEmployeeId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "plot"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "employee"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "areaId"
+                  ],
+                  "name": "plot_areaId_idx_abf7188c",
+                  "prefix": "plot_areaId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "sellerId"
+                  ],
+                  "name": "plot_sellerId_idx_d71255f2",
+                  "prefix": "plot_sellerId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "soldByEmployeeId"
+                  ],
+                  "name": "plot_soldByEmployeeId_idx_a6cbd2a2",
+                  "prefix": "plot_soldByEmployeeId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "soldToClientId"
+                  ],
+                  "name": "plot_soldToClientId_idx_6da72b19",
+                  "prefix": "plot_soldToClientId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "seller": {
               "checks": [
                 {
@@ -2409,6 +2849,14 @@
                 "NOT_INTERESTED"
               ]
             },
+            "PlotStatus": {
+              "kind": "valueSet",
+              "values": [
+                "AVAILABLE",
+                "UNAVAILABLE",
+                "SOLD"
+              ]
+            },
             "Priority": {
               "kind": "valueSet",
               "values": [
@@ -2433,7 +2881,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "b28d702d1ec86f052b9078c9adb92445970664566b573a21d59f97e57a5cde60"
+    "storageHash": "74f7f0a227aa53abdfc72d8fdab639af2ce1273c3366e5f9b7e4cbe6a32fd92d"
   },
   "capabilities": {
     "postgres": {
