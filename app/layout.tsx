@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "BrokerHub",
   description: "BrokerHub – Real Estate Management System",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logo.png",
   },
 };
 
